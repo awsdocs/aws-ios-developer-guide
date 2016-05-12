@@ -13,7 +13,7 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 #
-# AWS SDK for Android Developer Guide documentation build configuration file, created by
+# AWS SDK for iOS Developer Guide documentation build configuration file, created by
 # sphinx-quickstart on Thu Jan 14 17:27:57 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -59,7 +59,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'AWS Android Developer Guide'
+project = u'AWS iOS Developer Guide'
 copyright = u'2016, Amazon Web Services'
 author = u'Amazon Web Services'
 
@@ -213,7 +213,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'AWSSDKforAndroidDeveloperGuidedoc'
+htmlhelp_basename = 'AWSSDKforiOSDeveloperGuidedoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -235,7 +235,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'AWSSDKforAndroidDeveloperGuide.tex', project,
+  (master_doc, 'AWSSDKforiOSDeveloperGuide.tex', project,
    author, 'manual'),
 ]
 
@@ -279,8 +279,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'AWSSDKforAndroidDeveloperGuide', project,
-   author, 'AWSSDKforAndroidDeveloperGuide', 'One line description of project.',
+  (master_doc, 'AWSSDKforiOSDeveloperGuide', project,
+   author, 'AWSSDKforiOSDeveloperGuide', 'One line description of project.',
    'Miscellaneous'),
 ]
 
