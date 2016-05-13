@@ -8,12 +8,12 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-Amazon S3 Transfer Utility for iOS (Beta)
+Amazon S3 Transfer Utility for iOS
 #########################################
 
-`Amazon S3 Transfer Manager for iOS (Beta) <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/s3transfermanager.html#create-the-s3-transfermanager-client>`_ simplifies
+`Amazon S3 Transfer Manager for iOS <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/s3transfermanager.html#create-the-s3-transfermanager-client>`_ simplifies
 data transfer between your iOS app and Amazon S3. In addition to the S3 Transfer Manager, there is an easier and more powerful
-way to transfer data between your iOS app and Amazon S3, Amazon S3 Transfer Utility for iOS (Beta). This topic shows you how to get started with the new Amazon S3
+way to transfer data between your iOS app and Amazon S3, Amazon S3 Transfer Utility for iOS. This topic shows you how to get started with the new Amazon S3
 Transfer Utility.
 
 The Amazon S3 Transfer Utility offers two main advantages over the S3 Transfer Manager:
@@ -58,7 +58,7 @@ of `iOS Developer Guide <http://docs.aws.amazon.com/mobile/sdkforios/developergu
 Configuring the Application Delegate
 ------------------------------------
 
-The Transfer Utility for iOS (Beta) uses the background transfer feature in iOS to continue data transfers even when your app isn't
+The Transfer Utility for iOS uses the background transfer feature in iOS to continue data transfers even when your app isn't
 running.
 
 Call the following class method in your ``- application:handleEventsForBackgroundURLSession:completionHandler:``
