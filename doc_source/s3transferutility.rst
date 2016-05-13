@@ -113,7 +113,7 @@ the expression object. Here is a code snippet containing the completion handler 
     NSURL *fileURL = // The file to upload.
 
     AWSS3TransferUtilityUploadExpression *expression = [AWSS3TransferUtilityUploadExpression new];
-    expression.uploadProgress = ^(AWSS3TransferUtilityTask *task, int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
+    expression.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Do something e.g. Update a progress bar.
         });
@@ -156,7 +156,7 @@ To upload an instance of ``NSData`` call ``- uploadData:bucket:key:contentType:e
     NSData *dataToUpload = // The data to upload.
 
     AWSS3TransferUtilityUploadExpression *expression = [AWSS3TransferUtilityUploadExpression new];
-    expression.uploadProgress = ^(AWSS3TransferUtilityTask *task, int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend) {
+    expression.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Do something e.g. Update a progress bar.
         });
@@ -204,7 +204,7 @@ Here are code snippets you can use for downloading to a file.
     NSURL *fileURL = // The file URL of the download destination.
 
     AWSS3TransferUtilityDownloadExpression *expression = [AWSS3TransferUtilityDownloadExpression new];
-    expression.downloadProgress = ^(AWSS3TransferUtilityTask *task, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite) {
+    expression.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Do something e.g. Update a progress bar.
         });
@@ -245,7 +245,7 @@ Here are code snippets you can use for downloading binary data.
 ::
 
     AWSS3TransferUtilityDownloadExpression *expression = [AWSS3TransferUtilityDownloadExpression new];
-    expression.downloadProgress = ^(AWSS3TransferUtilityTask *task, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite) {
+    expression.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Do something e.g. Update a progress bar.
         });
@@ -353,4 +353,4 @@ you receive AWS temporary credentials that are valid up to 60 minutes. At the sa
 longer than that time. Because of this limitation, the S3 Transfer Utility enforces 50 minute transfer timeouts, leaving a 10 minute
 buffer before AWS temporary credentials are regenerated. After 50 minutes, you receive a transfer failure.
 
-If you need to transfer data that cannot be transferred in under 50 minutes, use ``AWSS3TransferManager`` instead.
+If you need to transfer data that cannot be transferred in under 50 minutes, use ``AWSS3`` instead.
