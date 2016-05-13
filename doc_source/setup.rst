@@ -25,7 +25,7 @@ machine:
 
 - Xcode 7 or later
 
-- iOS 7 or later
+- iOS 8 or later
 
 At the AWS GitHub repo, you can check out the `SDK source code <https://github.com/aws/aws-sdk-ios>`_.
 
@@ -34,54 +34,111 @@ At the AWS GitHub repo, you can check out the `SDK source code <https://github.c
 Include the SDK for iOS in an Existing Application
 ##################################################
 
-The samples included with the SDK for iOS are standalone projects that are already set up
-for you. You can also integrate the SDK for iOS with your own existing project. There are
-two ways to import the AWS Mobile SDK for iOS into your project:
+The samples included with the SDK for iOS are standalone projects that are already set up for you. You can also integrate the SDK for iOS with your own existing project. There are three ways to import the AWS Mobile SDK for iOS into your project:
 
 - CocoaPods
-- Frameworks
+- Carthage
+- Dynamic Frameworks
 
-You should use one of these two ways to import the AWS Mobile SDK but not both. Importing
-both ways loads two copies of the SDK into the project and causes compiler errors.
+You should use one of these three ways to import the AWS Mobile SDK but not multiple. Importing the SDK in multiple ways loads duplicate copies of the SDK into the project and causes compiler errors.
 
 CocoaPods
 =========
 
-#. The AWS Mobile SDK for iOS is available through `CocoaPods <http://cocoapods.org/>`_. If you have not
-   installed CocoaPods, install it by running the command:
+#. The AWS Mobile SDK for iOS is available through `CocoaPods <http://cocoapods.org/>`_. If you have not installed CocoaPods, install it by running the command:
 
-   :command:`$ sudo gem install cocoapods`
+    :command:`$ gem install cocoapods`
 
-#. In your project directory (the directory where your :file:`*.xcodeproj` file is), create a plain text file
-   named :file:`Podfile` (without any file extension) and add the lines below. If you want to use Amazon
-   Cognito Sync, make sure to include pod "AWSCognitoSync" as well::
+    :command:`$ pod setup`
 
-       source 'https://github.com/CocoaPods/Specs.git'
-       pod 'AWSCore'
-       pod 'AWSAutoScaling'
-       pod 'AWSCloudWatch'
-       pod 'AWSDynamoDB'
-       pod 'AWSEC2'
-       pod 'AWSElasticLoadBalancing'
-       pod 'AWSKinesis'
-       pod 'AWSLambda'
-       pod 'AWSMachineLearning'
-       pod 'AWSMobileAnalytics'
-       pod 'AWSS3'
-       pod 'AWSSES'
-       pod 'AWSSimpleDB'
-       pod 'AWSSNS'
-       pod 'AWSSQS'
-       pod 'AWSCognito'
+    Depending on your system settings, you may have to use `sudo` for installing `cocoapods` as follows:
+
+    :command:`$ sudo gem install cocoapods`
+
+    :command:`$ pod setup`
+
+#. In your project directory (the directory where your :file:`*.xcodeproj` file is), create a plain text file named :file:`Podfile` (without any file extension) and add the lines below. Replace `YourTarget` with your actual target name.::
+
+    source 'https://github.com/CocoaPods/Specs.git'
+    
+    platform :ios, '8.0'
+    use_frameworks!
+    
+    target :'YourTarget' do
+        pod 'AWSAutoScaling'
+        pod 'AWSCloudWatch'
+        pod 'AWSCognito'
+        pod 'AWSCognitoIdentityProvider'
+        pod 'AWSDynamoDB'
+        pod 'AWSEC2'
+        pod 'AWSElasticLoadBalancing'
+        pod 'AWSIoT'
+        pod 'AWSKinesis'
+        pod 'AWSLambda'
+        pod 'AWSMachineLearning'
+        pod 'AWSMobileAnalytics'
+        pod 'AWSS3'
+        pod 'AWSSES'
+        pod 'AWSSimpleDB'
+        pod 'AWSSNS'
+        pod 'AWSSQS'
+    end
 
 
-#. Then run the following command::
+#. Then run the following command:
 
-    $ pod install
+    :command:`$ pod install`
 
 #. Open up :file:`*.xcworkspace` with Xcode and start using the SDK.
 
 .. note:: Do NOT use :file:`*.xcodeproj`. If you open up a project file instead of a workspace, you receive an error.
+
+Carthage
+==========
+#. Install the latest version of `Carthage <https://github.com/Carthage/Carthage#installing-carthage>`_.
+
+#. Add the following to your `Cartfile`::
+
+	    github "aws/aws-sdk-ios"
+
+#. Then run the following command:
+	
+	    :command:`$ carthage update`
+
+#. With your project open in Xcode, select your **Target**. Under **General** tab, find **Embedded Binaries** and then click the **+** button.
+
+#. Click the **Add Other...** button, navigate to the `AWS<#ServiceName#>.framework` files under `Carthage` > `Build` > `iOS` and select them. Do not check the **Destination: Copy items if needed** checkbox when prompted.
+
+    * `AWSCore.framework`
+    * `AWSAutoScaling.framework`
+    * `AWSCloudWatch.framework`
+    * `AWSCognito.framework`
+    * `AWSCognitoIdentityProvider.framework`
+    * `AWSDynamoDB.framework`
+    * `AWSEC2.framework`
+    * `AWSElasticLoadBalancing.framework`
+    * `AWSIoT.framework`
+    * `AWSKinesis.framework`
+    * `AWSLambda.framework`
+    * `AWSMachineLearning.framework`
+    * `AWSMobileAnalytics.framework`
+    * `AWSS3.framework`
+    * `AWSSES.framework`
+    * `AWSSimpleDB.framework`
+    * `AWSSNS.framework`
+    * `AWSSQS.framework`
+
+#. Under the **Buid Phases** tab in your **Target**, click the **+** button on the top left and then select **New Run Script Phase**. Then setup the build phase as follows. Make sure this phase is below the `Embed Frameworks` phase.::
+
+	    Shell /bin/sh
+	    
+	    bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCore.framework/strip-frameworks.sh"
+	    
+	    Show environment variables in build log: Checked
+	    Run script only when installing: Not checked
+	    
+	    Input Files: Empty
+	    Output Files: Empty
 
 Frameworks
 ==========
@@ -91,31 +148,41 @@ Frameworks
    2.2.2, the filename is
    :file:`aws-ios-sdk-2.2.2`).
 
-   .. note:: The size of AWSiOSSDKv2.framework is > 65MB; however, it does not add > 65MB to your app binary when imported to your project. To learn more about the size of the app binary, see the `note under "Frameworks" <https://github.com/aws/aws-sdk-ios/#frameworks>`_.
 
-#. With your project open in Xcode, Control+click :strong:`Frameworks` and then click :strong:`Add files to
-   "<project name>"...`.
+#. With your project open in Xcode, select your **Target**. Under **General** tab, find **Embedded Binaries** and then click the **+** button.
 
-#. In Finder, navigate to the :file:`AWSxxx.framework` (where 'xxx' is the AWS service you wish to use) file, select the following files, and click :strong:`Add`.
+#. Click the **Add Other...** button, navigate to the `AWS<#ServiceName#>.framework` files and select them. Check the **Destination: Copy items if needed** checkbox when prompted.
 
-- :file:`AWSCore.framework`
-- :file:`AWSAutoScaling.framework`
-- :file:`AWSCloudWatch.framework`
-- :file:`AWSDynamoDB.framework`
-- :file:`AWSEC2.framework`
-- :file:`AWSElasticLoadBalancing.framework`
-- :file:`AWSKinesis.framework`
-- :file:`AWSLambda.framework`
-- :file:`AWSMachineLearning.framework`
-- :file:`AWSMobileAnalytics.framework`
-- :file:`AWSS3.framework`
-- :file:`AWSSES.framework`
-- :file:`AWSSimpleDB.framework`
-- :file:`AWSSNS.framework`
-- :file:`AWSSQS.framework`
-- :file:`extras/AWSCognito.framework` (for Cognito Sync)
+    * `AWSCore.framework`
+    * `AWSAutoScaling.framework`
+    * `AWSCloudWatch.framework`
+    * `AWSCognito.framework`
+    * `AWSCognitoIdentityProvider.framework`
+    * `AWSDynamoDB.framework`
+    * `AWSEC2.framework`
+    * `AWSElasticLoadBalancing.framework`
+    * `AWSIoT.framework`
+    * `AWSKinesis.framework`
+    * `AWSLambda.framework`
+    * `AWSMachineLearning.framework`
+    * `AWSMobileAnalytics.framework`
+    * `AWSS3.framework`
+    * `AWSSES.framework`
+    * `AWSSimpleDB.framework`
+    * `AWSSNS.framework`
+    * `AWSSQS.framework`
 
-4. Open a target for your project, select :strong:`Build Phases`, expand :strong:`Link Binary With Libraries`, click the :strong:`+` button, and add :file:`libsqlite3.dylib` and :file:`libz.dylib` and :file:`SystemConfiguration.framework`.
+4. Under the **Buid Phases** tab in your **Target**, click the **+** button on the top left and then select **New Run Script Phase**. Then setup the build phase as follows. Make sure this phase is below the `Embed Frameworks` phase.::
+
+        Shell /bin/sh
+        
+        bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCore.framework/strip-frameworks.sh"
+        
+        Show environment variables in build log: Checked
+        Run script only when installing: Not checked
+        
+        Input Files: Empty
+        Output Files: Empty
 
 Update the SDK to a Newer Version
 #################################
@@ -131,10 +198,38 @@ Run the following command in your project directory. CocoaPods automatically pic
 
 .. note:: If your pod is having an issue, you can delete :file:`Podfile.lock` and :file:`Pods/` and then run :command:`pod install` to cleanly install the SDK.
 
+Carthage
+=========
+
+Run the following command in your project directory. Carthage automatically picks up the new changes.
+
+:command:`$ carthage update`
+
 Frameworks
 ==========
 
-Follow the installation process shown previously to include the new version of the SDK.
+#. In Xcode select the following frameworks in **Project Navigator** and hit **delete** on your keyboard. Then select **Move to Trash**:
+
+    * `AWSCore.framework`
+    * `AWSAutoScaling.framework`
+    * `AWSCloudWatch.framework`
+    * `AWSCognito.framework`
+    * `AWSCognitoIdentityProvider.framework`
+    * `AWSDynamoDB.framework`
+    * `AWSEC2.framework`
+    * `AWSElasticLoadBalancing.framework`
+    * `AWSIoT.framework`
+    * `AWSKinesis.framework`
+    * `AWSLambda.framework`
+    * `AWSMachineLearning.framework`
+    * `AWSMobileAnalytics.framework`
+    * `AWSS3.framework`
+    * `AWSSES.framework`
+    * `AWSSimpleDB.framework`
+    * `AWSSNS.framework`
+    * `AWSSQS.framework`
+
+#. Follow the installation process above to include the new version of the SDK.
 
 Preparing iOS 9 Apps
 ####################
@@ -146,58 +241,48 @@ see `Preparing Your Apps for iOS 9 <http://docs.aws.amazon.com/mobile/sdkforios/
 Getting Started with Swift
 ##########################
 
-#. Create an Objective-C bridging header file using Xcode.
+#. Import the AWSCore header in the application delegate. ::
 
-#. In the bridging header, import the appropriate headers for the services you are using. The header file
-   import convention for CocoaPods is ``#import "SERVICENAME.h"``, and for frameworks it is ``#import
-   <FRAMEWORKNAME/SERVICENAME.h>``, as in the following examples::
+        import AWSCore
 
-   #import <AWSCore/AWSCore.h>
-   #import <AWSS3/AWSS3.h>
-   #import <AWSDynamoDB/AWSDynamoDB.h>
-   #import <AWSSQS/AWSSQS.h>
-   #import <AWSSNS/AWSSNS.h>
-   #import <AWSCognito/AWSCognito.h>
+#. Create a default service configuration by adding the following code snippet in the `application:didFinishLaunchingWithOptions:` application delegate method. ::
 
+        let credentialsProvider = AWSCognitoCredentialsProvider(
+            regionType: CognitoRegionType,
+            identityPoolId: CognitoIdentityPoolId)
+        let configuration = AWSServiceConfiguration(
+            region: DefaultServiceRegionType,
+            credentialsProvider: credentialsProvider)
+        AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
 
-#. From :guilabel:`Your Target` > :guilabel:`Build Settings` > :guilabel:`Objective-C Bridging Header`, point
-   :guilabel:`Objective-C Bridging Header` to the bridging header you just created.
+#. In Swift file you want to use the SDK, import the appropriate headers for the services you are using. The header file import convention is `import AWSServiceName`, as in the following examples::
 
-#. Import the AWSCore header in the application delegate::
+        import AWSS3
+        import AWSDynamoDB
+        import AWSSQS
+        import AWSSNS
+        import AWSCognito
+        
+#. Make a call to the AWS services. ::
 
-       #import <AWSCore/AWSCore.h>
+        let dynamoDB = AWSDynamoDB.defaultDynamoDB()
+        let listTableInput = AWSDynamoDBListTablesInput()
+        dynamoDB.listTables(listTableInput).continueWithBlock{ (task: AWSTask?) -> AnyObject? in
+            if let error = task.error {
+                print("Error occurred: \(error)")
+                return nil
+            }
 
-#. Create a default service configuration by adding the following code snippet in the ``application:didFinishLaunchingWithOptions:`` application delegate method::
+            let listTablesOutput = task.result as AWSDynamoDBListTablesOutput
 
-	let credentialsProvider = AWSCognitoCredentialsProvider(
-		regionType: AWSRegionType.USEast1, identityPoolId: cognitoIdentityPoolId)
+            for tableName in listTablesOutput.tableNames {
+                print("\(tableName)")
+            }
 
-	let defaultServiceConfiguration = AWSServiceConfiguration(
-		region: AWSRegionType.USEast1, credentialsProvider: credentialsProvider)
-
-	AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = defaultServiceConfiguration
-
-
-#. Make a call to the AWS services::
-
-       let dynamoDB = AWSDynamoDB.defaultDynamoDB()
-       let listTableInput = AWSDynamoDBListTablesInput()
-       dynamoDB.listTables(listTableInput).continueWithBlock{ (task: AWSTask!) -> AnyObject! in
-           if let error = task.error {
-               print("Error occurred: \(error)")
-               return nil
-	    }
-
-           let listTablesOutput = task.result as AWSDynamoDBListTablesOutput
-
-           for tableName : AnyObject in listTablesOutput.tableNames {
-               print("\(tableName)")
-           }
-
-           return nil
-       }
-
-   .. note:: Most of the service client classes have a singleton method to get a default client. The naming convention is ``+ defaultSERVICENAME`` (e.g. ``+ defaultDynamoDB`` in the above code snippet). This singleton method creates a service client with ``defaultServiceConfiguration``, which you set up in step 5, and maintains a strong reference to the client.
+            return nil
+        }
+        
+.. note:: Most of the service client classes have a singleton method to get a default client. The naming convention is `+ defaultSERVICENAME` (e.g. `+ defaultDynamoDB` in the above code snippet). This singleton method creates a service client with `defaultServiceConfiguration`, which you set up in step 5, and maintains a strong reference to the client.
 
 Getting Started with Objective-C
 ################################
@@ -206,7 +291,7 @@ Getting Started with Objective-C
 
        #import <AWSCore/AWSCore.h>
 
-#. Create a default service configuration by adding the following code snippet in the ``application:didFinishLaunchingWithOptions:`` application delegate method.::
+#. Create a default service configuration by adding the following code snippet in the ``application:didFinishLaunchingWithOptions:`` application delegate method. ::
 
 	AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionUSEast1
 		identityPoolId:CognitoPoolID];
@@ -247,32 +332,33 @@ Logging
 
 Changing log levels during development may make debugging easier. You can change the log level by importing AWSCore.h and calling:
 
-**Swift**::
+**Swift** ::
 
     AWSLogger.defaultLogger().logLevel = .Verbose
 
 The following logging level options are available:
 
 - ``.None``
-- ``.Error`` (This is the default. Only error logs are printed to the console.)
+- ``.Error``
 - ``.Warn``
 - ``.Info``
-- ``.Debug``
+- ``.Debug`` (This is the default.)
 - ``.Verbose``
 
-**Objective-C**::
+**Objective-C** ::
 
     [AWSLogger defaultLogger].logLevel = AWSLogLevelVerbose;
 
 The following logging level options are available:
 
 - ``AWSLogLevelNone``
-- ``AWSLogLevelError`` (This is the default. Only error logs are printed to the console.)
+- ``AWSLogLevelError``
 - ``AWSLogLevelWarn``
 - ``AWSLogLevelInfo``
-- ``AWSLogLevelDebug``
+- ``AWSLogLevelDebug`` (This is the default.)
 - ``AWSLogLevelVerbose``
 
+We recommend setting the log level to `None` before publishing to the Apple App Store.
 
 Get AWS Credentials with Amazon Cognito or AWS Identity and Access Management
 =============================================================================
@@ -290,7 +376,11 @@ Sample Apps
 
 The AWS SDK for iOS includes sample apps that demonstrate common use cases.
 
-**Cognito Sync Sample** (`Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/CognitoSync-Sample/Objective-C/>`__)
+**Cognito Your User Pools Sample** (`Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/CognitoYourUserPools-Sample/Objective-C/>`__)
+
+This sample demonstrates how sign up and sign in a user to display an authenticated portion of your app.
+
+**Cognito Sync Sample** (`Swift <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/CognitoSync-Sample/Swift/>`__, `Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/CognitoSync-Sample/Objective-C/>`__)
 
 This sample demonstrates how to securely manage and sync your mobile app data and create unique identities via login providers including Facebook, Google, and Login with Amazon.
 
@@ -299,7 +389,7 @@ AWS Services Demonstrated:
 - `Amazon Cognito Sync <http://aws.amazon.com/cognito/>`_
 - `Amazon Cognito Identity <http://aws.amazon.com/cognito/>`_
 
-**DynamoDB Object Mapper Sample** (`Swift <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/DynamoDBObjectMapper-Sample/Swift>`__`Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/DynamoDBObjectMapper-Sample/Objective-C/>`__)
+**DynamoDB Object Mapper Sample** (`Swift <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/DynamoDBObjectMapper-Sample/Swift>`__, `Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/DynamoDBObjectMapper-Sample/Objective-C/>`__)
 
 This sample demonstrates how to insert / update / delete / query items using DynamoDB Object Mapper.
 
@@ -308,9 +398,9 @@ AWS Services Demonstrated:
 - `Amazon DynamoDB <http://aws.amazon.com/cognito/>`_
 - `Amazon Cognito Identity <http://aws.amazon.com/cognito/>`_
 
-**S3 Transfer Manager Sample** (`Swift <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferManager-Sample/Swift/>`__, `Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferManager-Sample/Objective-C/>`__)
+**S3 Transfer Utility Sample** (`Swift <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferUtility-Sample/Swift/>`__, `Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferUtility-Sample/Objective-C/>`__)
 
-This sample demonstrates how to upload / download multiple files simultaneously using S3 Transfer Manager. It also shows how to pause, resume, and cancel file upload / download.
+This sample demonstrates how to use the Amazon S3 Transfer Utility to download / upload files.
 
 AWS Services Demonstrated:
 
