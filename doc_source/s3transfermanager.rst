@@ -45,8 +45,8 @@ To use S3 with your mobile app, first set up the AWS Mobile SDK for iOS:
 
 	#import <AWSS3/AWSS3.h>
 
-Conigure Credentials
---------------------
+Configure Credentials
+---------------------
 
 Amazon Cognito lets you create unique end user identifiers for accessing AWS cloud
 services. You'll use Cognito to provide temporary AWS credentials to your app.
