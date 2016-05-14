@@ -43,7 +43,7 @@ To use S3 with your mobile app, first set up the AWS Mobile SDK for iOS:
 #. Download the iOS SDK and include it in your iOS project, as described at :doc:`setup`.
 #. Import the following header into your project::
 
-	#iport <AWSS3/AWSS3.h>
+	#import <AWSS3/AWSS3.h>
 
 Conigure Credentials
 --------------------
