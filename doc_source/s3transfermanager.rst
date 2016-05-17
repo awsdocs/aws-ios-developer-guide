@@ -61,7 +61,7 @@ Create and Configure an S3 Bucket
 
 Amazon S3 stores your resources in buckets |mdash| cloud storage containers that live in a
 specific `region <http://docs.aws.amazon.com/general/latest/gr/rande.html>`_. Each S3 bucket
-must ave a globally unique name.
+must have a globally unique name.
 
 Let's use the AWS Management Console to create an S3 bucket.
 
