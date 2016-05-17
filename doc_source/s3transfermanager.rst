@@ -32,7 +32,7 @@ Getting Started
 
 This section provides a step-by-step guide for getting started with Amazon S3 using the
 AWS Mobile SDK for iOS. You can also try out the
-`Aazon S3 sample <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferManager-Sample/
+`Amazon S3 sample <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferManager-Sample/
 Objective-C>`_ available in the AWSLabs GitHub repository.
 
 Get the SDK
