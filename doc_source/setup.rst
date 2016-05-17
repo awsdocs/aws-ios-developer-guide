@@ -395,7 +395,7 @@ This sample demonstrates how to insert / update / delete / query items using Dyn
 
 AWS Services Demonstrated:
 
-- `Amazon DynamoDB <http://aws.amazon.com/cognito/>`_
+- `Amazon DynamoDB <http://aws.amazon.com/dynamodb/>`_
 - `Amazon Cognito Identity <http://aws.amazon.com/cognito/>`_
 
 **S3 Transfer Utility Sample** (`Swift <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferUtility-Sample/Swift/>`__, `Objective-C <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferUtility-Sample/Objective-C/>`__)
