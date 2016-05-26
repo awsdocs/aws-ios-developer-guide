@@ -25,7 +25,7 @@ enables more robust transfers, since an I/O error in any individual piece means 
 only needs to retransmit the one affected piece, and not the entire transfer.
 
 S3 Transfer Manager provides simple APIs to pause, resume, and cancel file transfers.
-or information about S3 Region availability, see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
+For information about S3 Region availability, see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
 
 Getting Started
 ===============
