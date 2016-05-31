@@ -43,6 +43,6 @@ This will install the AWS Mobile SDK and any needed dependencies. Next, reopen y
 
 Your project now has the AWS Mobile SDK for iOS installed.
 
-For more detailed infomration about installing the AWS Mobile SDK for iOS, see :doc:`setup`
+For more detailed information about installing the AWS Mobile SDK for iOS, see :doc:`setup`
 
 .. _Install CocoaPods: http://cocoapods.org
