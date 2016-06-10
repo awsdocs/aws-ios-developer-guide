@@ -134,9 +134,9 @@ You can access the client context in your lambda function as follows:
 	console.log("installation_id = " + context.clientContext.client.installation_id);
 	console.log("app_version_code = " + context.clientContext.client.app_version_code);
 	console.log("app_version_name = " + context.clientContext.client.app_version_name);
-	console.log("app_package_namae = " + context.clientContext.client.app_package_name);
+	console.log("app_package_name = " + context.clientContext.client.app_package_name);
 	console.log("app_title = " + context.clientContext.client.app_title);
-	console.log("platform_version = " + context.clientContext.env.platform_versioin);
+	console.log("platform_version = " + context.clientContext.env.platform_version);
 	console.log("platform = " + context.clientContext.env.platform);
 	console.log("make = " + context.clientContext.env.make);
 	console.log("model = " + context.clientContext.env.model);
