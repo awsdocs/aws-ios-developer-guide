@@ -106,7 +106,7 @@ You can pass parameters to your Amazon Lambda Function using a dictionary, an ar
 ::
 
    // Invoke with dictionary input
-    AWSLambdaInvoker *lambdaInvoker = [AWSLambdaInvoker defaultLambdaInvoker]
+    AWSLambdaInvoker *lambdaInvoker = [AWSLambdaInvoker defaultLambdaInvoker];
     NSDictionary *parameters = @{@"key1" : @"value1",
                                  @"key2" : @"value2",
                                  @"key3" : @"value3",
