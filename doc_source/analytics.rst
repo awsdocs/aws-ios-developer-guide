@@ -82,14 +82,13 @@ need to provide the :code:`appId` value that you generated in the Amazon Mobile 
 The :code:`appId` is used to group your data in the Amazon Mobile Analytics console.
 
 ::
-    
+
     AWSMobileAnalyticsConfiguration *analyticsConfiguration = [[AWSMobileAnalyticsConfiguration alloc] init];
     [analyticsConfiguration setServiceConfiguration:serviceConfiguration];
     AWSMobileAnalytics *analytics = [AWSMobileAnalytics mobileAnalyticsForAppId:@"yourAppId" configuration: analyticsConfiguration];
 
 
-where "yourAppId" is the :code:`appId` value from the Amazon Mobile Analytics console and
-"cognitoId" is the Cognito identity pool ID.
+where "yourAppId" is the :code:`appId` value from the Amazon Mobile Analytics console.
 
 Add Monetization Events
 -----------------------
