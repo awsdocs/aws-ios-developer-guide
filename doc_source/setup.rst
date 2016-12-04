@@ -60,10 +60,10 @@ CocoaPods
 #. In your project directory (the directory where your :file:`*.xcodeproj` file is), create a plain text file named :file:`Podfile` (without any file extension) and add the lines below. Replace `YourTarget` with your actual target name.::
 
     source 'https://github.com/CocoaPods/Specs.git'
-    
+
     platform :ios, '8.0'
     use_frameworks!
-    
+
     target :'YourTarget' do
         pod 'AWSAutoScaling'
         pod 'AWSCloudWatch'
@@ -75,8 +75,11 @@ CocoaPods
         pod 'AWSIoT'
         pod 'AWSKinesis'
         pod 'AWSLambda'
+        pod 'AWSLex'
         pod 'AWSMachineLearning'
         pod 'AWSMobileAnalytics'
+        pod 'AWSPinpoint'
+        pod 'AWSPolly'
         pod 'AWSS3'
         pod 'AWSSES'
         pod 'AWSSimpleDB'
@@ -102,7 +105,7 @@ Carthage
 	    github "aws/aws-sdk-ios"
 
 #. Then run the following command:
-	
+
 	    :command:`$ carthage update`
 
 #. With your project open in Xcode, select your **Target**. Under **General** tab, find **Embedded Binaries** and then click the **+** button.
@@ -120,8 +123,11 @@ Carthage
     * `AWSIoT.framework`
     * `AWSKinesis.framework`
     * `AWSLambda.framework`
+    * `AWSLex.framework`
     * `AWSMachineLearning.framework`
     * `AWSMobileAnalytics.framework`
+    * `AWSPinpoint.framework`
+    * `AWSPolly.framework`
     * `AWSS3.framework`
     * `AWSSES.framework`
     * `AWSSimpleDB.framework`
@@ -131,12 +137,12 @@ Carthage
 #. Under the **Build Phases** tab in your **Target**, click the **+** button on the top left and then select **New Run Script Phase**. Then setup the build phase as follows. Make sure this phase is below the `Embed Frameworks` phase.::
 
 	    Shell /bin/sh
-	    
+
 	    bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCore.framework/strip-frameworks.sh"
-	    
+
 	    Show environment variables in build log: Checked
 	    Run script only when installing: Not checked
-	    
+
 	    Input Files: Empty
 	    Output Files: Empty
 
@@ -164,8 +170,11 @@ Frameworks
     * `AWSIoT.framework`
     * `AWSKinesis.framework`
     * `AWSLambda.framework`
+    * `AWSLex.framework`
     * `AWSMachineLearning.framework`
     * `AWSMobileAnalytics.framework`
+    * `AWSPinpoint.framework`
+    * `AWSPolly.framework`
     * `AWSS3.framework`
     * `AWSSES.framework`
     * `AWSSimpleDB.framework`
@@ -175,12 +184,12 @@ Frameworks
 4. Under the **Build Phases** tab in your **Target**, click the **+** button on the top left and then select **New Run Script Phase**. Then setup the build phase as follows. Make sure this phase is below the `Embed Frameworks` phase.::
 
         Shell /bin/sh
-        
+
         bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCore.framework/strip-frameworks.sh"
-        
+
         Show environment variables in build log: Checked
         Run script only when installing: Not checked
-        
+
         Input Files: Empty
         Output Files: Empty
 
@@ -221,8 +230,11 @@ Frameworks
     * `AWSIoT.framework`
     * `AWSKinesis.framework`
     * `AWSLambda.framework`
+    * `AWSLex.framework`
     * `AWSMachineLearning.framework`
     * `AWSMobileAnalytics.framework`
+    * `AWSPinpoint.framework`
+    * `AWSPolly.framework`
     * `AWSS3.framework`
     * `AWSSES.framework`
     * `AWSSimpleDB.framework`
@@ -262,7 +274,7 @@ Getting Started with Swift
         import AWSSQS
         import AWSSNS
         import AWSCognito
-        
+
 #. Make a call to the AWS services. ::
 
         let dynamoDB = AWSDynamoDB.defaultDynamoDB()
@@ -281,7 +293,7 @@ Getting Started with Swift
 
             return nil
         }
-        
+
 .. note:: Most of the service client classes have a singleton method to get a default client. The naming convention is `+ defaultSERVICENAME` (e.g. `+ defaultDynamoDB` in the above code snippet). This singleton method creates a service client with `defaultServiceConfiguration`, which you set up in step 5, and maintains a strong reference to the client.
 
 Getting Started with Objective-C

@@ -27,6 +27,7 @@ topics, and at length in :doc:`cognito-auth`.
 
 .. toctree::
    :maxdepth: 1
+   :titlesonly:
 
    Welcome
    getting-started-ios
@@ -41,6 +42,9 @@ topics, and at length in :doc:`cognito-auth`.
    dynamodb_om
    kinesis
    lambda
+   lex
+   polly
+   pinpoint
 
 Additional Resources
 ====================

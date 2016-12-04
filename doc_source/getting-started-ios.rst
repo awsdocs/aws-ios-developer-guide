@@ -17,7 +17,7 @@ Getting Started with the AWS Mobile SDK for iOS
 The AWS SDK for iOS provides the libraries, samples and, documentation needed to call AWS services from iOS apps. This guide will walk you through the following:
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 2
 
    install-ios-sdk
    getting-started-s3
@@ -27,6 +27,9 @@ The AWS SDK for iOS provides the libraries, samples and, documentation needed to
    getting-started-kinesis
    getting-started-lambda
    getting-started-machine-learning
+   getting-started-understand-natural-language-lex
+   getting-started-text-to-speech-polly
+   getting-started-interactive-user-campaigns-pinpoint
 
 For more information about the AWS SDK for iOS see :doc:`index`
 For more information about other AWS SDKs see `AWS Mobile SDK`_

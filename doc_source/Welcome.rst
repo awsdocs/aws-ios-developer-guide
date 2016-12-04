@@ -72,10 +72,34 @@ the instructions at :doc:`kinesis`.
 AWS Lambda
 ----------
 
-AWS Lambda is a compute service that runs your code in response to requests or events and automatically manages the compute resources for you, making it easy to build applications that respond quickly to new information. 
+AWS Lambda is a compute service that runs your code in response to requests or events and automatically manages the compute resources for you, making it easy to build applications that respond quickly to new information.
 
 After you've set up the SDK, you can start using AWS Lambda by following
 the instructions at :doc:`lambda`.
+
+Amazon Lex
+----------
+
+Amazon Lex is an AWS service for building  voice and text conversational interfaces into applications. With Amazon Lex, the same deep learning engine that powers Amazon Alexa is now available to any developer, enabling you to build sophisticated, natural language chatbots into your new and existing applications.
+
+After you've set up the SDK, you can start using Amazon Lex by following
+the instructions at :doc:`getting-started-understand-natural-language-lex`.
+
+Amazon Polly
+------------
+
+Amazon Polly is a service that turns text into lifelike speech, making it easy to develop mobile applications that use high-quality speech to increase engagement and accessibility. With Amazon Polly you can  quickly build speech-enabled apps that work in multiple geographies.
+
+After you've set up the SDK, you can start using Amazon Polly by following
+the instructions at :doc:`getting-started-text-to-speech-polly`.
+
+Amazon Pinpoint
+---------------
+
+Using Amazon Pinpoint, you can create push notification campaigns that provide your users with timely, relevant, personalized information to encourage them to keep using your mobile app. You can use push notification campaigns to increase app awareness, downloads, and launches; build customer loyalty; and ultimately boost your mobile revenues.
+
+After you've set up the SDK, you can start using Amazon Pinpoint by following
+the instructions at :doc:`getting-started-interactive-user-campaigns-pinpoint`.
 
 About the SDK for iOS
 #####################
@@ -108,19 +132,22 @@ The SDK is distributed as a :file:`.zip` file containing the following:
   - :file:`AWSElasticLoadBalancing.framework`
   - :file:`AWSKinesis.framework`
   - :file:`AWSLambda.framework`
+  - :file:`AWSLex.framework`
   - :file:`AWSMachineLearning.framework`
   - :file:`AWSMobileAnalytics.framework`
+  - :file:`AWSPinpoint.framework`
+  - :file:`AWSPolly.framework`
   - :file:`AWSS3.framework`
   - :file:`AWSSES.framework`
   - :file:`AWSSimpleDB.framework`
   - :file:`AWSSNS.framework`
   - :file:`AWSSQS.framework`
 - **extras/**
-  
+
   - :file:`AWSCognito.framework` - The framework for Amazon Cognito sync.
   - :file:`Amazon Software License.txt`
   - :file:`NOTICE`
-    
+
 - **documentation/** – Contains documentation, including a docset, for the AWS SDK for iOS.
 - **samples/** – Contains an HTML document that links to samples, which are named based on the services that they demonstrate.
 - **src/** – Contains an HTML document that links to source, which contains the implementation and header files for the AWS iOS libraries.
