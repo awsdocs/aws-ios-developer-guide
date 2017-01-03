@@ -25,4 +25,4 @@ For information on Amazon Polly concepts and service configuration, see `How it 
 
 For instructions on how to integrate Amazon Polly into your iOS application, see the `Application Examples <http://docs.aws.amazon.com/polly/latest/dg/examples-for-using-polly.html>`_ section of the |POL-dg|.
 
-For end to end sample apps using Amazon Polly see the `AWS SDK for iOS samples <https://github.com/awslabs/aws-sdk-android-samples/>`_.
+For end to end sample apps using Amazon Polly see the `AWS SDK for iOS samples <https://github.com/awslabs/aws-sdk-ios-samples/>`_.

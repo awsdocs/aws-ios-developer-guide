@@ -38,7 +38,7 @@ Setting Up
 Include the SDK in Your Project
 -------------------------------
 
-Follow the instructions on the `Set Up the SDK for iOS <http://docs.aws.amazon.com/mobile/sdkforiOS/developerguide/setup.html>`_ page to include the frameworks for this service.
+Follow the instructions on the `Set Up the SDK for iOS <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/setup.html>`_ page to include the frameworks for this service.
 
 Set IAM Permissions for Amazon Lex
 --------------------------------------------
