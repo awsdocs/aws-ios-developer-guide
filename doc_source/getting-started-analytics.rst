@@ -1,4 +1,4 @@
-.. Copyright 2010-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+.. Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
    This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0
    International License (the "License"). You may not use this file except in compliance with the
@@ -16,7 +16,7 @@ Tracking App Usage Data with Amazon Mobile Analytics
 Add the following import statement:
 ::
 
-	#import <AWSMobileAnalytics/AWSMobileAnalytics.h> 
+	#import <AWSMobileAnalytics/AWSMobileAnalytics.h>
 
 Integrating Amazon Mobile Analytics
 -----------------------------------
@@ -26,12 +26,12 @@ The sections below explain how to integrate Mobile Analytics with your app.
 Create an App in the Mobile Analytics Console
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Go to the `Amazon Mobile Analytics console <https://console.aws.amazon.com/mobileanalytics/home>`_ 
+Go to the `Amazon Mobile Analytics console <https://console.aws.amazon.com/mobileanalytics/home>`_
 and create an app. Note the :code:`appId` value, as you'll need it later.
 
 .. note::
 
-    To learn more about working in the console, see the 
+    To learn more about working in the console, see the
     `Amazon Mobile Analytics User Guide <http://docs.aws.amazon.com/mobileanalytics/latest/ug/>`_.
 
 Integrate the SDK into Your App
@@ -43,7 +43,7 @@ instructions direct you to import the headers for the services you'll be
 using. For this example, you need one of the following imports:
 ::
 
-	#import <AWSCore/AWSCore.h> 
+	#import <AWSCore/AWSCore.h>
 
 Initialize the Mobile Analytics Client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,7 +54,7 @@ The :code:`appId` is used to group your data in the Mobile Analytics console.
 
 ::
 
-    AWSMobileAnalytics *analytics = [AWSMobileAnalytics mobileAnalyticsForAppId:@"yourAppId" identityPoolId: @"cognitoId"]; 
+    AWSMobileAnalytics *analytics = [AWSMobileAnalytics mobileAnalyticsForAppId:@"yourAppId" identityPoolId: @"cognitoId"];
 
 where "yourAppId" is the :code:`appId` value from the Amazon Mobile Analytics console and
 "cognitoId" is the Cognito identity pool ID.
