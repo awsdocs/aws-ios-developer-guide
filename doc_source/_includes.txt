@@ -1,6 +1,7 @@
 .. project-specific includes for this project.
 
 ..
+.. |dg| replace:: Developer Guide
 .. |LEXlong| replace:: Amazon Lex
 .. |LEX| replace:: Amazon Lex
 .. |LEX-dg| replace:: |LEX| |dg|

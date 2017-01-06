@@ -60,22 +60,21 @@ Create a DynamoDB Table and Index
 
 For this tutorial, let's assume we're building a bookstore app. Our app will need to keep track of the books available in the bookstore, and we can create a DynamoDB table to do so.
 
-To create our Books table:
+To create the Books table:
 
-#. Log in to the `DynamoDB console <https://console.aws.amazon.com/dynamodb/>`_.
+#. Log in to the `DynamoDB Console <https://console.aws.amazon.com/dynamodb/home>`_.
 #. Click :guilabel:`Create Table`.
 #. Enter :command:`Books` as the name of the table.
-#. Select :guilabel:`Hash` as the primary key type.
-#. For the hash attribute name, ensure that :guilabel:`String` is selected and enter :command:`ISBN`. Click :guilabel:`Continue`.
-#. With the index type set to :guilabel:`Global Secondary Index` and the data type set to :guilabel:`String`,  enter :command:`Author` in the :guilabel:`Index Hash Key` field.
-#. In the :guilabel:`Index Range Key` field, with the data type set to :guilabel:`Number`, enter :command:`Price`.
-#. In the :guilabel:`Index Name` field enter :command:`Author-Price-index`.
-#. Leave the other values at their defaults and click :guilabel:`Add Index to Table` and then :guilabel:`Continue`.
-#. Set the read capacity to ``10`` and the write capacity to ``5``. Click :guilabel:`Continue`.
-#. Enter a notification email and click :guilabel:`Continue` to create throughput alarms.
+#. Enter :command:`ISBN` in the :guilabel:`Partition key` field of the :guilabel:`Primary key` with :guilabel:`String` as its type.
+#. Uncheck the :guilabel:`Use default settings` checkbox and click :guilabel:`+ Add Index`.
+#. In the :guilabel:`Add Index` dialog enter :command:`Author` with :guilabel:`String` as its type.
+#. Check the :guilabel:`Add sort key` checkbox and enter :command:`Title` as the sort key value, with :guilabel:`String` as its type.
+#. Leave the other values at their defaults and click :guilabel:`Add index` to add the :command:`Author-Title-index` index.
+#. Set the read capacity to ``10`` and the write capacity to ``5``.
 #. Click :guilabel:`Create`. DynamoDB will create your database.
 #. Refresh the console and select your Books table from the list of tables.
-#. Open the :guilabel:`Details` tab and copy or note the Amazon Resource Name (ARN). You'll need this in a moment.
+#. Open the :guilabel:`Overview` tab and copy or note the Amazon Resource Name (ARN). You'll need
+   this in a moment.
 
 Set Permissions
 ---------------
