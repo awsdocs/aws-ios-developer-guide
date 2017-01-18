@@ -37,7 +37,11 @@ To use DynamoDB from your mobile app, first set up the AWS Mobile SDK for iOS:
 #. Download the iOS SDK and include it in your iOS project, as described at :doc:`setup`.
 #. Import the following header into your project::
 
+Objective-C
     #import <AWSDynamoDB/AWSDynamoDB.h>
+
+Swift
+    import AWSDynamoDB
 
 Configure Credentials
 ---------------------
@@ -114,9 +118,13 @@ To learn more about IAM policies, see `Using IAM <http://docs.aws.amazon.com/IAM
 Create a DynamoDB Object Mapper Client
 --------------------------------------
 
-We're going to use the `AWSDynamoDBObjectMapper <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSDynamoDBObjectMapper.html>`_ to map a client-side class to our database. The Object Mapper supports high-level operations like creating, getting, querying, updating, and deleting records. We can create an Object Mapper as follows::
+We're going to use the `AWSDynamoDBObjectMapper <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSDynamoDBObjectMapper.html>`_ to map a client-side class to our database. The Object Mapper supports high-level operations like creating, getting, querying, updating, and deleting records. We can create an Object Mapper as follows
 
+Objective-C
     AWSDynamoDBObjectMapper *dynamoDBObjectMapper = [AWSDynamoDBObjectMapper defaultDynamoDBObjectMapper];
+
+Swift
+    let dynamoDBObjectMapper = AWSDynamoDBObjectMapper.default()
 
 All of the Object Mapper methods return an ``AWSTask`` object, so you'll need to work with ``AWSTask``
 in order to use DynamoDB effectively. To learn how to use the ``AWSTask`` class, see :doc:`awstask`.
@@ -138,6 +146,7 @@ We're going to map each item in the Book table to a ``Book`` object in the clien
 
 Here's the header for our ``Book`` class::
 
+Objective-C
     #import <Foundation/Foundation.h>
     #import <AWSDynamoDB/AWSDynamoDB.h>
 
@@ -158,6 +167,7 @@ Note that the case of each attribute name in the mapping class must match the ca
 
 Here's the implementation of our model::
 
+Objective-C
     #import <AWSDynamoDB/AWSDynamoDB.h>
     #import "Book.h"
 
@@ -173,6 +183,26 @@ Here's the implementation of our model::
 
     @end
 
+
+Swift
+    import AWSDynamoDB
+
+    class Book : AWSDynamoDBObjectModel, AWSDynamoDBModeling  {
+
+        var Title:String?
+        var Author:String?
+        var Price:String?
+        var ISBN:String?
+
+        class func dynamoDBTableName() -> String {
+            return "Book"
+        }
+
+        class func hashKeyAttribute() -> String {
+            return "ISBN"
+        }
+    }
+
 To conform to ``AWSDynamoDBModeling``, we have to implement ``dynamoDBTableName`` and ``hashKeyAttribute``. ``dynamoDBTableName`` should return the name of the table, and ``hashKeyAttribute`` should return the name of the hash key. If the table had a range key, we would also need to implement ``+ (NSString *)rangeKeyAttribute``.
 
 Interact with Stored Objects
@@ -187,27 +217,41 @@ The `save: <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSDynamoDBObjec
 
 First, we create the object that we want to save::
 
+Objective-C
     Book *myBook = [Book new];
     myBook.ISBN = @"3456789012";
     myBook.Title = @"The Scarlet Letter";
     myBook.Author = @"Nathaniel Hawthorne";
     myBook.Price = [NSNumber numberWithInt:899];
 
+Swift
+    let myBook = Book()
+    myBook?.ISBN = "3456789012"
+    myBook?.Title = "The Scarlet Letter"
+    myBook?.Author = "Nathaniel Hawthorne"
+    myBook?.Price = 899 as NSNumber?
+
 And then we pass the object to the ``save:`` method::
 
+Objective-C
     [[dynamoDBObjectMapper save:myBook]
      continueWithBlock:^id(AWSTask *task) {
          if (task.error) {
              NSLog(@"The request failed. Error: [%@]", task.error);
-         }
-         if (task.exception) {
-             NSLog(@"The request failed. Exception: [%@]", task.exception);
-         }
-         if (task.result) {
-             //Do something with the result.
+         } else {
+             // Do something with task.result or other operations
          }
          return nil;
      }];
+
+Swift
+    dynamoDBObjectMapper.save(myBook).continueWith(block: { (task:AWSTask<AnyObject>!) -> Any? in
+        if let error = task.error as? NSError {
+            print("The request failed. Error: \(error)")
+        } else {
+            // Do something with task.result or other operations
+        }
+    })
 
 Save Behavior Options
 ^^^^^^^^^^^^^^^^^^^^^
@@ -221,9 +265,13 @@ The AWS Mobile SDK for iOS supports the following save behavior options:
 
 Here's an example of setting a default save behavior on the Object Mapper::
 
+Objective-C
     AWSDynamoDBObjectMapperConfiguration *updateMapperConfig = [AWSDynamoDBObjectMapperConfiguration new];
-    updateMapperConfig.saveBehavior = AWSDynamoDBObjectMapperSaveBehaviorUpdate_Skip_Null_Attributes;
-    // Update_Skip_Null_Attributes
+    updateMapperConfig.saveBehavior = AWSDynamoDBObjectMapperSaveBehaviorUpdateSkipNullAttributes;
+
+Swift
+    let updateMapperConfig = AWSDynamoDBObjectMapperConfiguration()
+    updateMapperConfig.saveBehavior = .updateSkipNullAttributes
 
 Then we can use ``updateMapperConfig`` as an argument when calling `save:configuration: <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSDynamoDBObjectMapper.html#//api/name/save:configuration:>`_.
 
@@ -232,20 +280,27 @@ Retrieve an Item
 
 Using an object's primary key (in this case, the hash attribute "ISBN"), we can load the corresponding item from the database. The following code snippet returns the Book item with an ISBN of "6543210987"::
 
+Objective-C
 	[[dynamoDBObjectMapper load:[Book class] hashKey:@"6543210987" rangeKey:nil]
 	continueWithBlock:^id(AWSTask *task) {
 		if (task.error) {
 			NSLog(@"The request failed. Error: [%@]", task.error);
-		}
-		if (task.exception) {
-			NSLog(@"The request failed. Exception: [%@]", task.exception);
-		}
-		if (task.result) {
-			Book *book = task.result;
-			//Do something with the result.
+		} else {
+			Book *resultBook = task.result;
+			// Do something with the result.
 		}
 		return nil;
 	}];
+
+Swift
+    dynamoDBObjectMapper.load(Book.self, hashKey: "6543210987" rangeKey:nil).continueWith(block: { (task:AWSTask<AnyObject>!) -> Any? in
+        if let error = task.error as? NSError {
+            print("The request failed. Error: \(error)")
+        } else if let resultBook = task.result as? Book {
+            // Do something with the result.
+        }
+        return nil
+    })
 
 The Object Mapper creates a mapping between the Book item returned from the database and the ``Book`` object on the client (here, ``resultBook``). Thus, assuming that the Book item has a title, we could access the title at ``resultBook.Title``.
 
@@ -263,6 +318,7 @@ Delete an Item
 
 To delete a table row, use the ``remove:`` method::
 
+Objective-C
     Book *bookToDelete = [Book new];
     bookToDelete.ISBN = @"4456789012";
 
@@ -271,15 +327,23 @@ To delete a table row, use the ``remove:`` method::
 
          if (task.error) {
              NSLog(@"The request failed. Error: [%@]", task.error);
-         }
-         if (task.exception) {
-             NSLog(@"The request failed. Exception: [%@]", task.exception);
-         }
-         if (task.result) {
-             //Item deleted.
+         } else {
+             // Item deleted.
          }
          return nil;
      }];
+
+Swift
+    let bookToDelete = Book()
+    bookToDelete?.ISBN = "4456789012";
+
+    dynamoDBObjectMapper.remove(bookToDelete).continueWith(block: { (task:AWSTask<AnyObject>!) -> Any? in
+        if let error = task.error as? NSError {
+            print("The request failed. Error: \(error)")
+        } else {
+            // Item deleted.
+        }
+    })
 
 Perform a Scan
 ==============
@@ -288,6 +352,7 @@ With a scan operation, we can retrieve all items from a given table. A scan exam
 
 The ``scan:expression:`` method takes two parameters |mdash| the class of the resulting object and an instance of ``AWSDynamoDBScanExpression``, which provides options for filtering results. In the following example, we create an ``AWSDynamoDBScanExpression`` object and set its ``limit`` property. Then we pass our ``Book`` class and the expression object to ``scan:expression:``::
 
+Objective-C
     AWSDynamoDBScanExpression *scanExpression = [AWSDynamoDBScanExpression new];
     scanExpression.limit = @10;
 
@@ -296,24 +361,36 @@ The ``scan:expression:`` method takes two parameters |mdash| the class of the re
      continueWithBlock:^id(AWSTask *task) {
          if (task.error) {
              NSLog(@"The request failed. Error: [%@]", task.error);
-         }
-         if (task.exception) {
-             NSLog(@"The request failed. Exception: [%@]", task.exception);
-         }
-         if (task.result) {
+         } else {
              AWSDynamoDBPaginatedOutput *paginatedOutput = task.result;
              for (Book *book in paginatedOutput.items) {
-                 //Do something with book.
+                 // Do something with book.
              }
          }
          return nil;
      }];
 
+Swift
+    let scanExpression = AWSDynamoDBScanExpression()
+    scanExpression.limit = 20
+
+    dynamoDBObjectMapper.scan(Book.self, expression: scanExpression).continueWith(block: { (task:AWSTask<AnyObject>!) -> Any? in
+        if let error = task.error as? NSError {
+            print("The request failed. Error: \(error)")
+        } else if let paginatedOutput = task.result {
+            for book in paginatedOutput.items as! Book {
+                // Do something with book.
+            }
+        }
+    })
+
 The output of a scan is returned as an ``AWSDynamoDBPaginatedOutput`` object. We can access the array of returned items via the ``items`` property.
 
-The ``scanExpression`` method provides several optional parameters. For example, you can optionally use a filter expression to filter the scan result. With a filter expression, you can specify a condition, attribute names, and values on which you want the condition evaluated. For more information about the parameters and the API, see `AWSDynamoDBScanExpression: <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSDynamoDBScanExpression.html>`_.
+The ``scanExpression`` method provides several optional parameters. For example, you can optionally use a filter expression to filter the scan result. With a filter expression, you can specify a condition, attribute names, and values on which you want the condition evaluated. For more information about the parameters and the API, see `AWSDynamoDBScanExpression: <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSDynamoDBScanExpression.html>`_.
 
-The following code snippet scans the Books table to find books with price less than 50::
+The following code snippet scans the Books table to find books with price less than 50
+
+Objective-C::
 
 	AWSDynamoDBScanExpression *scanExpression = [AWSDynamoDBScanExpression new];
 	scanExpression.limit = @10;
@@ -325,11 +402,7 @@ The following code snippet scans the Books table to find books with price less t
  	continueWithBlock:^id(AWSTask *task) {
 	     if (task.error) {
 	         NSLog(@"The request failed. Error: [%@]", task.error);
-	     }
-	     if (task.exception) {
-	         NSLog(@"The request failed. Exception: [%@]", task.exception);
-	     }
-	     if (task.result) {
+	     } else {
 	         AWSDynamoDBPaginatedOutput *paginatedOutput = task.result;
 	         for (Book *book in paginatedOutput.items) {
 	             //Do something with book.
@@ -337,6 +410,23 @@ The following code snippet scans the Books table to find books with price less t
 	     }
 	     return nil;
 	 }];
+
+Swift::
+
+  let scanExpression = AWSDynamoDBScanExpression()
+  scanExpression.limit = 10
+  scanExpression.filterExpression = "Price < :val"
+  scanExpression.expressionAttributeValues = [":val": 50]
+
+  dynamoDBObjectMapper.scan(Book.self, expression: scanExpression).continueWith(block: { (task:AWSTask<AnyObject>!) -> Any? in
+      if let error = task.error as? NSError {
+          print("The request failed. Error: \(error)")
+      } else if let paginatedOutput = task.result {
+          for book in paginatedOutput.items as! Book {
+              // Do something with book.
+          }
+      }
+  })
 
 You can also use the ``projectionExpression`` property to specify the attributes to retrieve from the ``Books`` table. For example adding ``scanExpression.projectionExpression = @"ISBN, Title, Price";``  in the previous code snippet retrieves only those three properties in the book object. The ``Author`` property in the book object will always be nil.
 
@@ -346,29 +436,27 @@ higher priority traffic on the table. The *Amazon DynamoDB Developer Guide* has 
 Perform a Query
 ===============
 
-The Query API enables you to query a table or a secondary index. You must provide a hash key value in ``AWSDynamoDBQueryExpression``. To query an index, you must also specify the ``indexName``. You must specify the ``hashKeyAttribute`` if you query a global secondary with a different hashKey. If the table or index has a range key, you can optionally refine the results by providing a range key value and a condition.
-The ``query:expression:`` method takes two parameters |mdash| the class of the resulting object and an instance of ``AWSDynamoDBQueryExpression``. In the following example, we query the ``Books`` index table to find all books with author of "John Smith" and price less than 50::
+The Query API enables you to query a table or a secondary index. You must provide a hash key value in ``AWSDynamoDBQueryExpression``. To query an index, you must also specify the ``indexName``. You must specify the ``hashKeyAttribute`` if you query a global secondary with a different hashKey. If the table or index has a range key, you can optionally refine the results by providing a range key value and a condition.
+The ``query:expression:`` method takes two parameters |mdash| the class of the resulting object and an instance of ``AWSDynamoDBQueryExpression``. In the following example, we query the ``Books`` index table to find all books with author of "John Smith" and price less than 50.
+
+Objective-C::
 
 	AWSDynamoDBQueryExpression *queryExpression = [AWSDynamoDBQueryExpression new];
 
 	queryExpression.indexName = @"Author-Price-index";
 
-	queryExpression.hashKeyAttribute = @"Author";
-	queryExpression.hashKeyValues = @"John Smith";
+	//queryExpression.hashKeyAttribute = @"Author";
+	//queryExpression.hashKeyValues = @"John Smith";
 
-	queryExpression.rangeKeyConditionExpression = @"Price < :val";
-	queryExpression.expressionAttributeValues = @{@":val":@50};
+	queryExpression.rangeKeyConditionExpression = @"Author = :authorName AND Price < :val";
+	queryExpression.expressionAttributeValues = @{@":authorName": @"John Smith", @":val": @50};
 
 	[[dynamoDBObjectMapper query:[Book class]
                   expression:queryExpression]
  	continueWithBlock:^id(AWSTask *task) {
 	     if (task.error) {
 	         NSLog(@"The request failed. Error: [%@]", task.error);
-	     }
-	     if (task.exception) {
-	         NSLog(@"The request failed. Exception: [%@]", task.exception);
-	     }
-	     if (task.result) {
+	     } else {
 	         AWSDynamoDBPaginatedOutput *paginatedOutput = task.result;
 	         for (Book *book in paginatedOutput.items) {
 	             //Do something with book.
@@ -376,6 +464,27 @@ The ``query:expression:`` method takes two parameters |mdash| the class of the r
 	     }
 	     return nil;
 	 }];
+
+Swift::
+
+  let queryExpression = AWSDynamoDBQueryExpression()
+  queryExpression.indexName = "Author-Price-index"
+
+	//queryExpression.hashKeyAttribute = "Author"
+	//queryExpression.hashKeyValues = "John Smith"
+
+  queryExpression.rangeKeyConditionExpression = @"Author = :authorName AND Price < :val";
+	queryExpression.expressionAttributeValues = @{@":authorName": @"John Smith", @":val": @50};
+
+  dynamoDBObjectMapper.query(Book.self, expression: queryExpression).continueWith(block: { (task:AWSTask<AnyObject>!) -> Any? in
+      if let error = task.error as? NSError {
+          print("The request failed. Error: \(error)")
+      } else if let paginatedOutput = task.result {
+          for book in paginateOutput.items as! Book {
+              // Do something with book.
+          }
+      }
+  })
 
 In preceding code, ``indexName`` was specified since we are querying a index. We must also specify the ``hashKeyAttribute`` since the ``hashKeyAttribute`` name of the global secondary index is different from the table. We optionally specified ``rangeKeyConditionExpression`` and ``expressionAttributeValues`` to refine the query to only retrieve items with Price less than 50.
 We can also provide ``filterExpression`` and ``projectionExpression`` in ``AWSDynamoDBQueryExpression``. The syntax is the same as that used in a scan operation.
@@ -493,4 +602,3 @@ Additional Resources
 
 * `Amazon DynamoDB Developer Guide <http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/>`_
 * `Amazon DynamoDB API Reference <http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/>`_
-
