@@ -12,26 +12,19 @@
 Getting Started with the AWS Mobile SDK for iOS
 ===============================================
 
-.. highlight:: objc
-
-The AWS SDK for iOS provides the libraries, samples and, documentation needed to call AWS services from iOS apps. This guide will walk you through the following:
+The AWS SDK for iOS provides the libraries, samples and, documentation needed to call AWS services from iOS apps. This Getting Started section covers the topics that are common to iOS apps that utilize AWS services, including:
 
 .. toctree::
    :maxdepth: 2
+   :titlesonly:
 
-   install-ios-sdk
-   getting-started-s3
-   getting-started-cognito
-   getting-started-dynamodb
-   getting-started-analytics
-   getting-started-kinesis
-   getting-started-lambda
-   getting-started-machine-learning
-   getting-started-understand-natural-language-lex
-   getting-started-text-to-speech-polly
-   getting-started-interactive-user-campaigns-pinpoint
+   setup-aws-sdk-for-ios
+   cognito-auth-aws-identity-for-ios
+   awstask
+   ats
 
-For more information about the AWS SDK for iOS see :doc:`index`
-For more information about other AWS SDKs see `AWS Mobile SDK`_
+For more information about the AWS SDK for iOS see :doc:`Welcome`.
+
+For more information about other AWS SDKs see `AWS Mobile SDK`_.
 
 .. _AWS Mobile SDK: http://aws.amazon.com/mobile/sdk/

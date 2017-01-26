@@ -32,18 +32,8 @@ Cognito also persists data locally, so that it's available even if the device is
 offline.
 
 After you've set up the SDK, you can start using Amazon Cognito by following the
-instructions at :doc:`cognito-auth` and :doc:`cognito-sync`.
+instructions at :doc:`cognito-auth-aws-identity-for-ios` and :doc:`cognito-sync-data-across-devices-for-ios`.
 
-Amazon Mobile Analytics
------------------------
-
-Amazon Mobile Analytics lets you collect, visualize, and understand app usage for your
-mobile apps. Reports are available for metrics on active users, sessions, retention,
-in-app revenue, and custom events, and can be filtered by platform and date
-range.
-
-After you've set up the SDK, you can start using Amazon Mobile Analytics by following
-the instructions at :doc:`analytics`.
 
 Amazon Simple Storage Service (S3)
 ----------------------------------
@@ -51,7 +41,7 @@ Amazon Simple Storage Service (S3)
 Amazon Simple Storage Service (S3) provides secure, durable, highly-scalable object storage in the cloud. Using the AWS Mobile SDK, you can directly access Amazon S3 from your mobile app.
 
 After you've set up the SDK, you can start using Amazon S3 by following
-the instructions at :doc:`s3transfermanager`.
+the instructions at :doc:`s3-simple-storage-service-for-ios`.
 
 Amazon DynamoDB
 ---------------
@@ -59,7 +49,7 @@ Amazon DynamoDB
 Amazon DynamoDB is a fast, highly scalable, highly available, cost-effective, nonrelational database service. DynamoDB removes traditional scalability limitations on data storage while maintaining low latency and predictable performance.
 
 After you've set up the SDK, you can start using Amazon DynamoDB by following
-the instructions at :doc:`dynamodb_om`.
+the instructions at :doc:`dynamodb-nosql-database-for-ios`.
 
 Amazon Kinesis
 --------------
@@ -67,7 +57,7 @@ Amazon Kinesis
 Amazon Kinesis is a fully managed service for real-time processing of streaming data at massive scale.
 
 After you've set up the SDK, you can start using Amazon Kinesis by following
-the instructions at :doc:`kinesis`.
+the instructions at :doc:`kinesis-data-stream-processing-for-ios`.
 
 AWS Lambda
 ----------
@@ -75,7 +65,7 @@ AWS Lambda
 AWS Lambda is a compute service that runs your code in response to requests or events and automatically manages the compute resources for you, making it easy to build applications that respond quickly to new information.
 
 After you've set up the SDK, you can start using AWS Lambda by following
-the instructions at :doc:`lambda`.
+the instructions at :doc:`lambda-serverless-business-logic-in-the-cloud-for-ios`.
 
 Amazon Lex
 ----------
@@ -83,7 +73,7 @@ Amazon Lex
 Amazon Lex is an AWS service for building  voice and text conversational interfaces into applications. With Amazon Lex, the same deep learning engine that powers Amazon Alexa is now available to any developer, enabling you to build sophisticated, natural language chatbots into your new and existing applications.
 
 After you've set up the SDK, you can start using Amazon Lex by following
-the instructions at :doc:`getting-started-understand-natural-language-lex`.
+the instructions at :doc:`lex-natural-language-interface-for-ios`.
 
 Amazon Polly
 ------------
@@ -91,7 +81,7 @@ Amazon Polly
 Amazon Polly is a service that turns text into lifelike speech, making it easy to develop mobile applications that use high-quality speech to increase engagement and accessibility. With Amazon Polly you can  quickly build speech-enabled apps that work in multiple geographies.
 
 After you've set up the SDK, you can start using Amazon Polly by following
-the instructions at :doc:`getting-started-text-to-speech-polly`.
+the instructions at :doc:`polly-convert-text-to-speech-for-ios`.
 
 Amazon Pinpoint
 ---------------
@@ -99,7 +89,19 @@ Amazon Pinpoint
 Using Amazon Pinpoint, you can create push notification campaigns that provide your users with timely, relevant, personalized information to encourage them to keep using your mobile app. You can use push notification campaigns to increase app awareness, downloads, and launches; build customer loyalty; and ultimately boost your mobile revenues.
 
 After you've set up the SDK, you can start using Amazon Pinpoint by following
-the instructions at :doc:`getting-started-interactive-user-campaigns-pinpoint`.
+the instructions at :doc:`pinpoint-mobile-analytics-and-user-engagement-for-ios`.
+
+Amazon Mobile Analytics
+-----------------------
+
+Amazon Mobile Analytics, which is now being rolled into Amazon Pinpoint, lets you collect, visualize,
+and understand app usage for your mobile apps. Reports are available for metrics on active users, sessions,
+retention, in-app revenue, and custom events, and can be filtered by platform and date range.
+
+Amazon Pinpoint service offers analytics plus allows you to act programmatically on the data you gather through
+customizable push user engagement. Existing Amazon Mobile Analytics objects/configurations are automatically ported to
+Amazon Pinpoint. For the time being you can still use Amazon Mobile Analytics by following
+the instructions at :doc:`analytics`.
 
 About the SDK for iOS
 #####################

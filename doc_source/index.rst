@@ -23,28 +23,24 @@ After you've set up the SDK, you can start working with the mobile clients for A
 Services. The mobile clients are described in the service-specific topics. No matter which
 services you're using, you should provide AWS credentials to your app via Amazon Cognito.
 The Amazon Cognito credential provider is discussed briefly in the various mobile service
-topics, and at length in :doc:`cognito-auth`.
+topics, and at length in :doc:`cognito-auth-aws-identity-for-ios`.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :titlesonly:
 
    Welcome
    getting-started-ios
-   setup
-   awstask
-   ats
-   cognito-auth
-   cognito-sync
+   s3-simple-storage-service-for-ios
+   dynamodb-nosql-database-for-ios
+   lambda-serverless-business-logic-in-the-cloud-for-ios
+   cognito-sync-data-across-devices-for-ios
+   kinesis-data-stream-processing-for-ios
+   lex-natural-language-interface-for-ios
+   polly-convert-text-to-speech-for-ios
+   pinpoint-mobile-analytics-and-user-engagement-for-ios
+   machine-learning-for-ios
    analytics
-   s3transfermanager
-   s3transferutility
-   dynamodb_om
-   kinesis
-   lambda
-   lex
-   polly
-   pinpoint
 
 Additional Resources
 ====================

@@ -8,94 +8,101 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-.. highlight:: objc
 
-Preparing Your Apps for iOS 9
-#############################
+####################################
+Preparing Your App to Work with ATS
+####################################
 
-The release of iOS 9 includes changes that might impact how your apps interact with some AWS services. If you compile your apps
-with Apple's iOS 9 SDK (or Xcode 7), Apple's `App Transport Security (ATS) <https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/>`_
-feature may affect the ability of apps to connect to certain AWS service endpoints. In order to ensure affected apps continue to
-successfully connect to AWS endpoints, you'll need to configure them to interact properly with Apple's ATS by adding these
-properties to your ``Info.plist`` file::
+Introduced since the release of iOS 9, the Apple's `App Transport Security (ATS) <https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/>`_
+feature might impact how your apps interact with some AWS services.
 
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSExceptionDomains</key>
+If you use Apple's iOS 9 SDK (or Xcode 7) or later, your app could be prohibited from connecting to certain AWS service endpoints, if the AWS service does not yet meet all the ATS requirements. To get around this, you can configure the app to interact properly with Apple's ATS by adding these properties to your ``Info.plist`` file.
+
+    .. code-block:: xml
+
+        <key>NSAppTransportSecurity</key>
         <dict>
-            <key>amazonaws.com</key>
+            <key>NSExceptionDomains</key>
             <dict>
-                  <key>NSThirdPartyExceptionMinimumTLSVersion</key>
-                  <string>TLSv1.0</string>
-                  <key>NSThirdPartyExceptionRequiresForwardSecrecy</key>
-                  <false/>
-                  <key>NSIncludesSubdomains</key>
-                  <true/>
-            </dict>
-            <key>amazonaws.com.cn</key>
-            <dict>
-                  <key>NSThirdPartyExceptionMinimumTLSVersion</key>
-                  <string>TLSv1.0</string>
-                  <key>NSThirdPartyExceptionRequiresForwardSecrecy</key>
-                  <false/>
-                  <key>NSIncludesSubdomains</key>
-                  <true/>
+                <key>amazonaws.com</key>
+                <dict>
+                      <key>NSThirdPartyExceptionMinimumTLSVersion</key>
+                      <string>TLSv1.0</string>
+                      <key>NSThirdPartyExceptionRequiresForwardSecrecy</key>
+                      <false/>
+                      <key>NSIncludesSubdomains</key>
+                      <true/>
+                </dict>
+                <key>amazonaws.com.cn</key>
+                <dict>
+                      <key>NSThirdPartyExceptionMinimumTLSVersion</key>
+                      <string>TLSv1.0</string>
+                      <key>NSThirdPartyExceptionRequiresForwardSecrecy</key>
+                      <false/>
+                      <key>NSIncludesSubdomains</key>
+                      <true/>
+                </dict>
             </dict>
         </dict>
-    </dict>
 
-If you are not planning to recompile your apps with Apple's iOS 9 SDK (or Xcode 7) to run on iOS 9 devices,
+If you are not planning to recompile your apps with Apple's iOS 9 SDK (or Xcode 7) or later to run on iOS 9 or later devices,
 you do not need to make any configuration changes.
 
 Determining if Your App is Affected
 ===================================
 
-If your app stops working after upgrading to Xcode 7 and iOS 9, follow these steps to determine if it affected by ATS.
+If your app stops working after upgrading to Xcode 7 or later and iOS 9 or later, follow these steps to determine if it affected by ATS.
 
 1. Turn on verbose logging of the AWS Mobile SDK for iOS by calling the following line in the ``- application:didFinishLaunchingWithOptions:`` application delegate.
 
-    **Swift**::
+   .. container:: option
 
-        @UIApplicationMain
-        class AppDelegate: UIResponder, UIApplicationDelegate {
+        Swift
+            .. code-block:: swift
 
-            var window: UIWindow?
-            func application(application: UIApplication, didFinishLaunchingWithOptions
-            launchOptions: [NSObject : AnyObject]?) -> Bool {
-                ...
-                AWSLogger.defaultLogger().logLevel = .Verbose
-                ...
+                @UIApplicationMain
+                class AppDelegate: UIResponder, UIApplicationDelegate {
 
-                return true
-            }
-        }
+                    var window: UIWindow?
+                    func application(application: UIApplication, didFinishLaunchingWithOptions
+                    launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+                        ...
+                        AWSLogger.default().logLevel = .verbose
+                        ...
 
-    **Objective-C**::
+                        return true
+                    }
+                }
 
-        #import <AWSCore/AWSCore.h>
+        Objective-C
+            .. code-block:: objc
 
-        @implementation AppDelegate
+                #import <AWSCore/AWSCore.h>
 
-        - (BOOL)application:(UIApplication *)application
-        didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-            ...
-            [AWSLogger defaultLogger].logLevel = AWSLogLevelVerbose;
-            ...
+                @implementation AppDelegate
 
-            return YES;
-        }
+                - (BOOL)application:(UIApplication *)application
+                didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+                    ...
+                    [AWSLogger defaultLogger].logLevel = AWSLogLevelVerbose;
+                    ...
 
-        @end
+                    return YES;
+                }
+
+                @end
 
 2. Run your app and make a request to an AWS service.
 
-3. Search your log output for "SSL". If you find the "An SSL error has occurred and a secure connection to the server cannot be made" message, your app is affected by the ATS changes::
+3. Search your log output for "SSL". If you find the "An SSL error has occurred and a secure connection to the server cannot be made" message, your app is affected by the ATS changes
 
-    2015-10-06 11:39:13.402 DynamoDBSampleSwift[14467:303540] CFNetwork SSLHandshake failed (-9824)
-    2015-10-06 11:39:13.403 DynamoDBSampleSwift[14467:303540] NSURLSession/NSURLConnection HTTP load failed (kCFStreamErrorDomainSSL, -9824)
-    2015-10-06 11:39:13.569 DynamoDBSampleSwift[14467:303540] CFNetwork SSLHandshake failed (-9824)
-    2015-10-06 11:39:13.569 DynamoDBSampleSwift[14467:303540] NSURLSession/NSURLConnection HTTP load failed (kCFStreamErrorDomainSSL, -9824)
-    Error: Error Domain=NSURLErrorDomain Code=-1200 "An SSL error has occurred and a secure connection to the server cannot be made." UserInfo={_kCFStreamErrorCodeKey=-9824, NSLocalizedRecoverySuggestion=Would you like to connect to the server anyway?, NSUnderlyingError=0x7fca343012f0 {Error Domain=kCFErrorDomainCFNetwork Code=-1200 "(null)" UserInfo={_kCFStreamPropertySSLClientCertificateState=0, _kCFNetworkCFStreamSSLErrorOriginalValue=-9824, _kCFStreamErrorDomainKey=3, _kCFStreamErrorCodeKey=-9824}}, NSLocalizedDescription=An SSL error has occurred and a secure connection to the server cannot be made., NSErrorFailingURLKey=https://dynamodb.us-east-1.amazonaws.com/, NSErrorFailingURLStringKey=https://dynamodb.us-east-1.amazonaws.com/, _kCFStreamErrorDomainKey=3}
+    .. code-block:: text
+
+        2015-10-06 11:39:13.402 DynamoDBSampleSwift[14467:303540] CFNetwork SSLHandshake failed (-9824)
+        2015-10-06 11:39:13.403 DynamoDBSampleSwift[14467:303540] NSURLSession/NSURLConnection HTTP load failed (kCFStreamErrorDomainSSL, -9824)
+        2015-10-06 11:39:13.569 DynamoDBSampleSwift[14467:303540] CFNetwork SSLHandshake failed (-9824)
+        2015-10-06 11:39:13.569 DynamoDBSampleSwift[14467:303540] NSURLSession/NSURLConnection HTTP load failed (kCFStreamErrorDomainSSL, -9824)
+        Error: Error Domain=NSURLErrorDomain Code=-1200 "An SSL error has occurred and a secure connection to the server cannot be made." UserInfo={_kCFStreamErrorCodeKey=-9824, NSLocalizedRecoverySuggestion=Would you like to connect to the server anyway?, NSUnderlyingError=0x7fca343012f0 {Error Domain=kCFErrorDomainCFNetwork Code=-1200 "(null)" UserInfo={_kCFStreamPropertySSLClientCertificateState=0, _kCFNetworkCFStreamSSLErrorOriginalValue=-9824, _kCFStreamErrorDomainKey=3, _kCFStreamErrorCodeKey=-9824}}, NSLocalizedDescription=An SSL error has occurred and a secure connection to the server cannot be made., NSErrorFailingURLKey=https://dynamodb.us-east-1.amazonaws.com/, NSErrorFailingURLStringKey=https://dynamodb.us-east-1.amazonaws.com/, _kCFStreamErrorDomainKey=3}
 
    If you cannot find the SSL handshake error message, it is possible that another problem caused your app to stop working. Some internal
    behaviors change with major operating system updates, and it is common for previously unseen issues to surface.
@@ -115,4 +122,4 @@ If you see the SSL handshake error, follow these steps to resolve the issue.
 
 .. image:: images/ss2.png
 
-After following these steps, your app should be able to access AWS endpoints while running on iOS 9.
+After following these steps, your app should be able to access AWS endpoints while running on iOS 9 or later.

@@ -8,11 +8,9 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-######################################################################
-Process Streaming Data with Amazon Kinesis and Amazon Kinesis Firehose
-######################################################################
-
-.. highlight:: objc
+##################################################################
+Amazon Kinesis and Amazon Kinesis Firehose: Process Streaming Data
+##################################################################
 
 Amazon Kinesis is a fully managed service for real-time processing of streaming data at massive
 scale.
@@ -60,7 +58,7 @@ the data to the destination that you specified.
 For more information about Amazon Kinesis Firehose, see `Amazon Kinesis Firehose
 <http://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html>`_.
 
-You can also learn more about how the Kinesis services work together on the following page: `Amazon
+You can also learn more about how the Amazon Kinesis services work together on the following page: `Amazon
 Kinesis services <http://aws.amazon.com/kinesis/>`_.
 
 
@@ -71,12 +69,21 @@ To use the Amazon Kinesis mobile client, you'll need to integrate the SDK for iO
 and import the necessary libraries. To do so, follow these steps:
 
 If you haven't already done so, `download the SDK for iOS <http://aws.amazon.com/mobile/sdk/>`_,
-unzip it, and include it in your application as described at :doc:`setup`. The
+unzip it, and include it in your application as described at :doc:`setup-aws-sdk-for-ios`. The
 instructions direct you to import the headers for the services you'll be
-using. For this example, you need the following import:
-::
+using. For this example, you need the following import.
 
-    #import <AWSKinesis/AWSKinesis.h>
+    .. container:: option
+
+        Swift
+            .. code-block:: swift
+
+                import AWSKinesis
+
+        Objective-C
+            .. code-block:: objc
+
+                #import <AWSKinesis/AWSKinesis.h>
 
 You can use Amazon Cognito to provide temporary AWS credentials to your application.
 
@@ -84,31 +91,33 @@ These credentials let the app access your AWS resources. To create a credentials
 
 To use Amazon Kinesis in an application, you must set the correct permissions. The
 following IAM policy allows the user to submit records to a specific Amazon Kinesis
-stream, which is identified by `ARN <http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html>`_:
-::
+stream, which is identified by `ARN <http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html>`_.
 
-    {
-    "Statement": [{
-        "Effect": "Allow",
-        "Action": "kinesis:PutRecords",
-        "Resource": "arn:aws:kinesis:us-west-2:111122223333:stream/mystream"
-    }]
-    }
+    .. code-block:: json
+
+        {
+            "Statement": [{
+                "Effect": "Allow",
+                "Action": "kinesis:PutRecords",
+                "Resource": "arn:aws:kinesis:us-west-2:111122223333:stream/mystream"
+            }]
+        }
 
 
 The following IAM policy allows the user to submit records to a specific Amazon Kinesis Firehose
-stream:
-::
+stream.
 
-    {
-    "Statement": [{
-        "Effect": "Allow",
-        "Action": "firehose:PutRecordBatch",
-        "Resource": "arn:aws:firehose:us-west-2:111122223333:deliverystream/mystream"
-    }]
-    }
+    .. code-block:: json
 
-This policy should be applied to roles assigned to the Cognito
+        {
+            "Statement": [{
+                "Effect": "Allow",
+                "Action": "firehose:PutRecordBatch",
+                "Resource": "arn:aws:firehose:us-west-2:111122223333:deliverystream/mystream"
+            }]
+        }
+
+This policy should be applied to roles assigned to the Amazon Cognito
 identity pool, but you will need to replace the :command:`Resource` value
 with the correct ARN for your Amazon Kinesis or Amazon Kinesis Firehose stream. You can apply policies at the
 `IAM console <https://console.aws.amazon.com/iam/>`_. To
@@ -122,25 +131,54 @@ To learn more about Amazon Kinesis Firehose policies, see `Controlling Access wi
 Once you have credentials, you can use :command:`AWSKinesisRecorder` with Amazon Kinesis. The
 following snippet returns a shared instance of the Amazon Kinesis service client:
 
-::
+    .. container:: option
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+        Swift
+            .. code-block:: swift
+
+                let kinesisRecorder = AWSKinesisRecorder.default()
+
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
 
 You can use :command:`AWSFirehoseRecorder` with Amazon Kinesis Firehose. The
 following snippet returns a shared instance of the Amazon Kinesis Firehose service client:
 
-::
+    .. container:: option
 
-    AWSFirehoseRecorder *firehoseRecorder = [AWSFirehoseRecorder defaultFirehoseRecorder];
+        Swift
+            .. code-block:: swift
+
+                let firehoseRecorder = AWSFirehoseRecorder.default()
+
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSFirehoseRecorder *firehoseRecorder = [AWSFirehoseRecorder defaultFirehoseRecorder];
 
 
 You can configure :command:`AWSKinesisRecorder` or :command:`AWSFirehoseRecorder` through their properties:
 
-::
+    .. container:: option
 
-    kinesisRecorder.diskAgeLimit = 30 * 24 * 60 * 60; // 30 days
-    kinesisRecorder.diskByteLimit = 10 * 1024 * 1024; // 10MB
-    kinesisRecorder.notificationByteThreshold = 5 * 1024 * 1024; // 5MB
+        Swift
+            .. code-block:: swift
+
+                kinesisRecorder.diskAgeLimit = TimeInterval(30 * 24 * 60 * 60); // 30 days
+                kinesisRecorder.diskByteLimit = UInt(10 * 1024 * 1024); // 10MB
+                kinesisRecorder.notificationByteThreshold = UInt(5 * 1024 * 1024); // 5MB
+
+
+        Objective-C
+            .. code-block:: objc
+
+                kinesisRecorder.diskAgeLimit = 30 * 24 * 60 * 60; // 30 days
+                kinesisRecorder.diskByteLimit = 10 * 1024 * 1024; // 10MB
+                kinesisRecorder.notificationByteThreshold = 5 * 1024 * 1024; // 5MB
 
 The :command:`diskAgeLimit` property sets the expiration for cached requests.
 When a request exceeds the limit, it's discarded. The default is no age limit. The
@@ -157,10 +195,19 @@ requests, check the :command:`diskBytesUsed` property.
 With :command:`AWSKinesisRecorder` created and configured, you can use
 :command:`saveRecord:streamName:` to save records to local storage.
 
-::
+    .. container:: option
+        Swift
+            .. code-block:: swift
 
-    NSData *yourData = [@"Test_data" dataUsingEncoding:NSUTF8StringEncoding];
-    [kinesisRecorder saveRecord:yourData streamName:@"YourStreamName"]
+                let yourData = "Test_data".data(using: .utf8)
+                kinesisRecorder.saveRecord(yourData, streamName: "YourStreamName")
+
+
+        Objective-C
+            .. code-block:: objc
+
+                NSData *yourData = [@"Test_data" dataUsingEncoding:NSUTF8StringEncoding];
+                [kinesisRecorder saveRecord:yourData streamName:@"YourStreamName"]
 
 In the preceding example, we create an NSData object and save it locally.
 :command:`YourStreamName` should be a string corresponding to the name of your
@@ -169,23 +216,41 @@ console <https://console.aws.amazon.com/kinesis/>`_.
 
 Here is a similar snippet for Amazon Kinesis Firehose:
 
-::
+    .. container:: option
 
-    NSData *yourData = [@"Test_data" dataUsingEncoding:NSUTF8StringEncoding];
-    [firehoseRecorder saveRecord:yourData streamName:@"YourStreamName"]
+        Swift
+            .. code-block:: swift
+
+                let yourData = "Test_data".data(using: .utf8)
+                firehoseRecorder.saveRecord(yourData, streamName: "YourStreamName")
+
+
+        Objective-C
+            .. code-block:: objc
+
+                NSData *yourData = [@"Test_data" dataUsingEncoding:NSUTF8StringEncoding];
+                [firehoseRecorder saveRecord:yourData streamName:@"YourStreamName"]
 
 
 To submit all the records stored on the device, call
 :command:`submitAllRecords`.
 
-::
+    .. container:: option
 
-    [kinesisRecorder submitAllRecords];
+        Swift
+            .. code-block:: swift
+
+                kinesisRecorder.submitAllRecords()
+
+                firehoseRecorder.submitAllRecords()
 
 
-::
+        Objective-C
+            .. code-block:: objc
 
-    [firehoseRecorder submitAllRecords];
+                [kinesisRecorder submitAllRecords];
+
+                [firehoseRecorder submitAllRecords];
 
 
 :command:`submitAllRecords` sends all locally saved requests to the Amazon Kinesis
@@ -196,24 +261,46 @@ Invalid requests are deleted.
 Both :command:`saveRecord` and :command:`submitAllRecords` are asynchronous
 operations, so you should ensure that :command:`saveRecord` is complete before you
 invoke :command:`submitAllRecords`. The following code sample shows the methods
-used correctly together:
+used correctly together.
 
-::
+     .. container:: option
 
-    // Create an array to store a batch of objects.
-    NSMutableArray *tasks = [NSMutableArray new];
-    for (int32_t i = 0; i < 100; i++) {
-        [tasks addObject:[kinesisRecorder saveRecord:[[NSString stringWithFormat:@"TestString-%02d", i] dataUsingEncoding:NSUTF8StringEncoding]
-                                          streamName:@"YourStreamName"]];
-    }
-    [[[AWSTask taskForCompletionOfAllTasks:tasks] continueWithSuccessBlock:^id(AWSTask *task) {
-        return [kinesisRecorder submitAllRecords];
-    }] continueWithBlock:^id(AWSTask *task) {
-        if (task.error) {
-            NSLog(@"Error: [%@]", task.error);
-        }
-        return nil;
-    }];
+        Swift
+            .. code-block:: swift
+
+                // Create an array to store a batch of objects.
+                var tasks = Array<AWSTask<AnyObject>>()
+                for i in 0...100 {
+                    tasks.append(kinesisRecorder!.saveRecord(String(format: "TestString-%02d", i).data(using: .utf8), streamName: "YourStreamName")!)
+                }
+
+                AWSTask(forCompletionOfAllTasks: tasks).continueOnSuccessWith(block: { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                    return kinesisRecorder?.submitAllRecords()
+                }).continueWith(block: { (task:AWSTask<AnyObject>) -> Any? in
+                    if let error = task.error as? NSError {
+                        print("Error: \(error)")
+                    }
+                    return nil
+                })
+
+
+        Objective-C
+            .. code-block:: objc
+
+                // Create an array to store a batch of objects.
+                NSMutableArray *tasks = [NSMutableArray new];
+                for (int32_t i = 0; i < 100; i++) {
+                    [tasks addObject:[kinesisRecorder saveRecord:[[NSString stringWithFormat:@"TestString-%02d", i] dataUsingEncoding:NSUTF8StringEncoding]
+                                              streamName:@"YourStreamName"]];
+                }
+                [[[AWSTask taskForCompletionOfAllTasks:tasks] continueWithSuccessBlock:^id(AWSTask *task) {
+                    return [kinesisRecorder submitAllRecords];
+                }] continueWithBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                        NSLog(@"Error: [%@]", task.error);
+                    }
+                    return nil;
+                }];
 
 To learn more about working with Amazon Kinesis, see the `Amazon Kinesis Developer Resources
 <http://aws.amazon.com/kinesis/developer-resources/>`_.

@@ -8,9 +8,6 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-
-.. highlight:: objc
-
 Working with AWSTask
 ####################
 
@@ -31,39 +28,88 @@ helps keep logic clean and code readable.
 Working with Asynchronous Methods
 ---------------------------------
 
-When you're working with the AWS Mobile SDK for iOS, it's important to remember that methods that return ``AWSTask`` are asynchronous. For example, ``AWSKinesisRecorder`` defines the following methods::
+When you're working with the AWS Mobile SDK for iOS, it's important to remember that methods that return ``AWSTask`` are asynchronous. For example, ``AWSKinesisRecorder`` defines the following methods:
 
-    - (AWSTask *)saveRecord:(NSData *)data
-                streamName:(NSString *)streamName;
+   .. container:: option
 
-    - (AWSTask *)submitAllRecords;
+        Swift
+            .. code-block:: swift
 
-These methods are asynchronous and return immediately. This means that the following code snippet may not submit ``testData`` to the Amazon Kinesis stream::
+                open func saveRecord(_ data: Data!, streamName: String!) -> AWSTask<AnyObject>!
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+                open func submitAllRecords() -> AWSTask<AnyObject>!
 
-    NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
-    [kinesisRecorder saveRecord:testData
-                     streamName:@"test-stream-name"];
+        Objective-C
+            .. code-block:: objc
 
-    [kinesisRecorder submitAllRecords];
+                - (AWSTask *)saveRecord:(NSData *)data
+                    streamName:(NSString *)streamName;
+
+                - (AWSTask *)submitAllRecords;
+
+These methods are asynchronous and return immediately. This means that the following code snippet may not submit ``testData`` to the Amazon Kinesis stream.
+
+   .. container:: option
+
+        Swift
+            .. code-block:: swift
+
+                let kinesisRecorder = AWSKinesisRecorder.default()
+
+                let testData = "test-data".data(using: .utf8)
+                _ = kinesisRecorder?.saveRecord(testData, streamName: "test-stream-name")
+
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+
+                NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
+                [kinesisRecorder saveRecord:testData
+                    streamName:@"test-stream-name"];
+
+                [kinesisRecorder submitAllRecords];
 
 The problem is that ``saveRecord:streamName:`` may return before it persists the record on the disk, in which case ``submitAllRecords`` won't see the saved record on disk.
 
-Here's the correct way to submit the data::
+Here's the correct way to submit the data.
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+    .. container:: option
 
-    NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
-    [[[kinesisRecorder saveRecord:testData
-                       streamName:@"test-stream-name"] continueWithSuccessBlock:^id(AWSTask *task) {
-        return [kinesisRecorder submitAllRecords];
-    }] continueWithBlock:^id(AWSTask *task) {
-        if (task.error) {
-            NSLog(@"Error: %@", task.error);
-        }
-        return nil;
-    }];
+        Swift
+            .. code-block:: swift
+
+                let kinesisRecorder = AWSKinesisRecorder.default()
+
+                let testData = "test-data".data(using: .utf8)
+                kinesisRecorder?.saveRecord(testData, streamName: "test-stream-name").continueOnSuccessWith(block: { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                    // Guaranteed to happen after saveRecord has executed and completed successfully.
+                    return kinesisRecorder?.submitAllRecords()
+                }).continueWith(block: { (task:AWSTask<AnyObject>) -> Any? in
+                    if let error = task.error as? NSError {
+                        print("Error: \(error)")
+                        return nil
+                    }
+
+                    return nil
+                })
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+
+                NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
+                [[[kinesisRecorder saveRecord:testData
+                                   streamName:@"test-stream-name"] continueWithSuccessBlock:^id(AWSTask *task) {
+                    return [kinesisRecorder submitAllRecords];
+                }] continueWithBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                        NSLog(@"Error: %@", task.error);
+                    }
+                    return nil;
+                }];
 
 Note that the ``submitAllRecords`` call is made within the ``continueWithSuccessBlock:`` because we want to execute ``submitAllRecords`` after ``saveRecord:streamName:`` successfully finishes executing. The ``continueWithBlock:`` and ``continueWithSuccessBlock:`` won't execute until the previous asynchronous call has already finished executing. Thus, in the example above, ``submitAllRecords`` is guaranteed to see the result of ``saveRecord:streamName:``.
 
@@ -102,26 +148,54 @@ For example, consider the following scenarios, which refer to the code snippet a
 
 Note that the code doesn't check for ``task.error`` in ``continueWithSuccessBlock:``, and ``NSLog(@"Error: %@", task.error);`` may print out an error from either ``submitAllRecords`` or ``saveRecord:streamName:``. This is a way to consolidate error handling logic at the end of the execution chain.
 
-If you want each block to deal with its own errors, you can rewrite the code snippet as follows::
+If you want each block to deal with its own errors, you can rewrite the code snippet as follows:
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+    .. container:: option
 
-    NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
-    [[[kinesisRecorder saveRecord:testData
-                       streamName:@"test-stream-name"] continueWithBlock:^id(AWSTask *task) {
-        if (task.error) {
-            NSLog(@"Error from 'saveRecord:streamName:': %@", task.error);
-            return nil;
-        }
-        return [kinesisRecorder submitAllRecords];
-    }] continueWithBlock:^id(AWSTask *task) {
-        if (task.error) {
-            NSLog(@"Error from 'submitAllRecords': %@", task.error);
-        }
-        return nil;
-    }];
+        Swift
+            .. code-block:: swift
 
-In this snippet, ``NSLog(@"Error from 'saveRecord:streamName:': %@", task.error);`` only logs an error from ``saveRecord:streamName:``, and ``NSLog(@"Error from 'submitAllRecords': %@", task.error);`` logs an error from ``submitAllRecords``. By using ``continueWithBlock:`` and ``continueWithSuccessBlock:`` properly, you can flexibly control the error handling flow.
+                let kinesisRecorder = AWSKinesisRecorder.default()
+
+                let testData = "test-data".data(using: .utf8)
+                kinesisRecorder?.saveRecord(testData, streamName: "test-stream-name").continueWith(block: { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                    if let error = task.error as? NSError {
+                        print("Error from 'saveRecord:streamName:': \(error)")
+                        return nil
+                    }
+                    return kinesisRecorder?.submitAllRecords()
+                }).continueWith(block: { (task:AWSTask<AnyObject>) -> Any? in
+                    if let error = task.error as? NSError {
+                        print("Error from 'submitAllRecords': \(error)")
+                        return nil
+                    }
+
+                    return nil
+                })
+
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+
+                NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
+                [[[kinesisRecorder saveRecord:testData
+                    streamName:@"test-stream-name"] continueWithBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                        NSLog(@"Error from 'saveRecord:streamName:': %@", task.error);
+                        return nil;
+                    }
+                    return [kinesisRecorder submitAllRecords];
+                }]continueWithBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                          NSLog(@"Error from 'submitAllRecords': %@", task.error);
+                    }
+                    return nil;
+                }];
+
+
+In the Objective-C snippet above, ``NSLog(@"Error from 'saveRecord:streamName:': %@", task.error);`` only logs an error from ``saveRecord:streamName:``, and ``NSLog(@"Error from 'submitAllRecords': %@", task.error);`` logs an error from ``submitAllRecords``. By using ``continueWithBlock:`` and ``continueWithSuccessBlock:`` properly, you can flexibly control the error handling flow. The same applies to the Swift snippet, except that ``print`` is used instead of ``NSLog``.
 
 Returning AWSTask or nil
 ------------------------
@@ -138,44 +212,99 @@ If you want to execute a large number of operations, you have two options: execu
 In Sequence
 ^^^^^^^^^^^
 
-Let's say you want to submit 100 records to a Kinesis stream in sequence. You can do so as follows::
+Let's say you want to submit 100 records to an Amazon Kinesis stream in sequence. You can do so as follows
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+    .. container:: option
 
-    AWSTask *task = [AWSTask taskWithResult:nil];
-    for (int32_t i = 0; i < 100; i++) {
-        task = [task continueWithSuccessBlock:^id(AWSTask *task) {
-            NSData *testData = [[NSString stringWithFormat:@"TestString-%02d", i] dataUsingEncoding:NSUTF8StringEncoding];
-            return [kinesisRecorder saveRecord:testData
-                                    streamName:@"test-stream-name"];
-        }];
-    }
+        Swift
+            .. code-block:: swift
 
-    [task continueWithSuccessBlock:^id(AWSTask *task) {
-        return [kinesisRecorder submitAllRecords];
-    }];
+                var task = AWSTask<AnyObject>(result: nil)
 
-In this case, the key is to concatenate a series of tasks by reassigning ``task``::
+                for i in 0...100 {
+                    task = task.continueOnSuccessWith(block: { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                        return kinesisRecorder!.saveRecord(String(format: "TestString-%02d", i).data(using: .utf8), streamName: "YourStreamName")
+                    })
+                }
 
-    task = [task continueWithSuccessBlock:^id(AWSTask *task) {
+                task.continueOnSuccessWith { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                    return kinesisRecorder?.submitAllRecords()
+                }
+
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+
+                AWSTask *task = [AWSTask taskWithResult:nil];
+                for (int32_t i = 0; i < 100; i++) {
+                    task = [task continueWithSuccessBlock:^id(AWSTask *task) {
+                        NSData *testData = [[NSString stringWithFormat:@"TestString-%02d", i] dataUsingEncoding:NSUTF8StringEncoding];
+                        return [kinesisRecorder saveRecord:testData
+                                                streamName:@"test-stream-name"];
+                    }];
+                }
+
+                [task continueWithSuccessBlock:^id(AWSTask *task) {
+                    return [kinesisRecorder submitAllRecords];
+                }];
+
+In this case, the key is to concatenate a series of tasks by reassigning ``task``.
+
+    .. container:: option
+
+        Swift
+            .. code-block:: swift
+
+                task.continueOnSuccessWith { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+
+        Objective-C
+            .. code-block:: objc
+
+                task = [task continueWithSuccessBlock:^id(AWSTask *task) {
 
 In Parallel
 ^^^^^^^^^^^
 
-You can execute multiple methods in parallel by using ``taskForCompletionOfAllTasks:`` as follows::
+You can execute multiple methods in parallel by using ``taskForCompletionOfAllTasks:`` as follows.
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+    .. container:: option
 
-    NSMutableArray *tasks = [NSMutableArray new];
-    for (int32_t i = 0; i < 100; i++) {
-        NSData *testData = [[NSString stringWithFormat:@"TestString-%02d", i] dataUsingEncoding:NSUTF8StringEncoding];
-        [tasks addObject:[kinesisRecorder saveRecord:testData
-                                          streamName:@"test-stream-name"]];
-    }
+        Swift
+            .. code-block:: swift
 
-    [[AWSTask taskForCompletionOfAllTasks:tasks] continueWithSuccessBlock:^id(AWSTask *task) {
-        return [kinesisRecorder submitAllRecords];
-    }];
+                var tasks = Array<AWSTask<AnyObject>>()
+                for i in 0...100 {
+                    tasks.append(kinesisRecorder!.saveRecord(String(format: "TestString-%02d", i).data(using: .utf8), streamName: "YourStreamName")!)
+                }
+
+                AWSTask(forCompletionOfAllTasks: tasks).continueOnSuccessWith(block: { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                    return kinesisRecorder?.submitAllRecords()
+                }).continueWith(block: { (task:AWSTask<AnyObject>) -> Any? in
+                    if let error = task.error as? NSError {
+                        print("Error: \(error)")
+                        return nil
+                    }
+
+                    return nil
+                })
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+
+                NSMutableArray *tasks = [NSMutableArray new];
+                for (int32_t i = 0; i < 100; i++) {
+                    NSData *testData = [[NSString stringWithFormat:@"TestString-%02d", i] dataUsingEncoding:NSUTF8StringEncoding];
+                    [tasks addObject:[kinesisRecorder saveRecord:testData
+                                                      streamName:@"test-stream-name"]];
+                }
+
+                [[AWSTask taskForCompletionOfAllTasks:tasks] continueWithSuccessBlock:^id(AWSTask *task) {
+                    return [kinesisRecorder submitAllRecords];
+                }];
 
 Here we create an instance of ``NSMutableArray``, put all of our tasks in it, and then pass it to ``taskForCompletionOfAllTasks:``, which is successful only when all of the tasks are successfully executed. This approach may be faster, but it may consume more system resources. Also, some AWS services, such as Amazon DynamoDB, throttle a large number of certain requests. Choose a sequential or parallel approach based on your use case.
 
@@ -187,51 +316,101 @@ By default, ``continueWithBlock:`` and ``continueWithSuccessBlock:`` are execute
 Grand Central Dispatch
 ^^^^^^^^^^^^^^^^^^^^^^
 
-You can use ``dispatch_async(dispatch_get_main_queue(), ^{...});`` to execute a block on the main thread. In the following example, we create a ``UIAlertView`` on the main thread when record submission fails::
+You can use ``dispatch_async(dispatch_get_main_queue(), ^{...});`` to execute a block on the main thread. In the following example, we create a ``UIAlertView`` on the main thread when record submission fails:
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+    .. container:: option
 
-    NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
-    [[[kinesisRecorder saveRecord:testData
-                       streamName:@"test-stream-name"] continueWithSuccessBlock:^id(AWSTask *task) {
-        return [kinesisRecorder submitAllRecords];
-    }] continueWithBlock:^id(AWSTask *task) {
-        if (task.error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertView *alertView =
-                    [[UIAlertView alloc] initWithTitle:@"Error!"
-                                               message:[NSString stringWithFormat:@"Error: %@", task.error]
-                                              delegate:nil
-                                     cancelButtonTitle:@"OK"
-                                     otherButtonTitles:nil];
-                [alertView show];
-            });
-        }
-        return nil;
-    }];
+        Swift
+            .. code-block:: swift
+
+                let kinesisRecorder = AWSKinesisRecorder.default()
+
+                let testData = "test-data".data(using: .utf8)
+                kinesisRecorder?.saveRecord(testData, streamName: "test-stream-name").continueOnSuccessWith(block: { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                    return kinesisRecorder?.submitAllRecords()
+                }).continueWith(block: { (task:AWSTask<AnyObject>) -> Any? in
+                    if let error = task.error as? NSError {
+                        DispatchQueue.main.async(execute: {
+                            let alertController = UIAlertView(title: "Error!", message: error.description, delegate: nil, cancelButtonTitle: "OK")
+                            alertController.show()
+                        })
+                        return nil
+                    }
+
+                    return nil
+                })
+
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+
+                NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
+                [[[kinesisRecorder saveRecord:testData
+                                   streamName:@"test-stream-name"] continueWithSuccessBlock:^id(AWSTask *task) {
+                    return [kinesisRecorder submitAllRecords];
+                }] continueWithBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            UIAlertView *alertView =
+                                [[UIAlertView alloc] initWithTitle:@"Error!"
+                                                           message:[NSString stringWithFormat:@"Error: %@", task.error]
+                                                          delegate:nil
+                                                 cancelButtonTitle:@"OK"
+                                                 otherButtonTitles:nil];
+                            [alertView show];
+                        });
+                    }
+                    return nil;
+                }];
 
 AWSExecutor
 ^^^^^^^^^^^
 
-Another option is to use ``AWSExecutor``::
+Another option is to use ``AWSExecutor``.
 
-    AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+    .. container:: option
 
-    NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
-    [[[kinesisRecorder saveRecord:testData
-                       streamName:@"test-stream-name"] continueWithSuccessBlock:^id(AWSTask *task) {
-        return [kinesisRecorder submitAllRecords];
-    }] continueWithExecutor:[AWSExecutor mainThreadExecutor] withBlock:^id(AWSTask *task) {
-        if (task.error) {
-            UIAlertView *alertView =
-                [[UIAlertView alloc] initWithTitle:@"Error!"
-                                           message:[NSString stringWithFormat:@"Error: %@", task.error]
-                                          delegate:nil
-                                 cancelButtonTitle:@"OK"
-                                 otherButtonTitles:nil];
-            [alertView show];
-        }
-        return nil;
-    }];
+        Swift
+            .. code-block:: swift
 
-In this case, ``withBlock:`` is executed on the main thread.
+                let kinesisRecorder = AWSKinesisRecorder.default()
+
+                let testData = "test-data".data(using: .utf8)
+                kinesisRecorder?.saveRecord(testData, streamName: "test-stream-name").continueOnSuccessWith(block: { (task:AWSTask<AnyObject>) -> AWSTask<AnyObject>? in
+                    return kinesisRecorder?.submitAllRecords()
+                }).continueWith(executor: AWSExecutor.mainThread(), block: { (task:AWSTask<AnyObject>) -> Any? in
+                    if let error = task.error as? NSError {
+                        let alertController = UIAlertView(title: "Error!", message: error.description, delegate: nil, cancelButtonTitle: "OK")
+                        alertController.show()
+                        return nil
+                    }
+
+                    return nil
+                })
+
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSKinesisRecorder *kinesisRecorder = [AWSKinesisRecorder defaultKinesisRecorder];
+
+                NSData *testData = [@"test-data" dataUsingEncoding:NSUTF8StringEncoding];
+                [[[kinesisRecorder saveRecord:testData streamName:@"test-stream-name"]
+                          continueWithSuccessBlock:^id(AWSTask *task) {
+                      return [kinesisRecorder submitAllRecords];
+                }] continueWithExecutor:[AWSExecutor mainThreadExecutor] withBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                        UIAlertView *alertView =
+                            [[UIAlertView alloc] initWithTitle:@"Error!"
+                                    message:[NSString stringWithFormat:@"Error: %@", task.error]
+                                    delegate:nil
+                                    cancelButtonTitle:@"OK"
+                                    otherButtonTitles:nil];
+                        [alertView show];
+                    }
+                    return nil;
+                }];
+
+In this case, ``withBlock:`` (Objective-C) or ``block:`` (Swift) is executed on the main thread.

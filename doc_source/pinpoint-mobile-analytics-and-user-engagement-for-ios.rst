@@ -11,7 +11,7 @@
 .. highlight:: java
 
 #######################################################
-Create Push Notification Campaigns with Amazon Pinpoint
+Amazon Pinpoint: Create Push Notification Campaigns
 #######################################################
 
 What is Amazon Pinpoint?
@@ -25,10 +25,4 @@ Using the following resources, you can integrate Amazon Pinpoint with your iOS a
 
 For information on Amazon Pinpoint concepts and service configuration, see the `Amazon Pinpoint Developer Guide <http://docs.aws.amazon.com/pinpoint/latest/developerguide/welcome.html>`_.
 
-For end to end sample apps using Amazon Pinpoint see the `AWS SDK for iOS samples <https://github.com/awslabs/aws-sdk-ios-samples/>`_.
-
-Make your app ready to be in an Amazon Pinpoint campaign
-========================================================
-
-See information on Amazon Pinpoint implementation for iOS apps in the
-`Integrating Amazon Pinpoint With iOS Apps <http://docs.aws.amazon.com/pinpoint/latest/developerguide/mobile-sdk-ios.html>`_ section of the Amazon Pinpoint Developer Guide.
+For instructions on how to integrate Amazon Pinpoint into your iOS application, see `Integrating Amazon Pinpoint With iOS Apps <http://docs.aws.amazon.com/pinpoint/latest/developerguide/mobile-sdk-ios.html>`_.
