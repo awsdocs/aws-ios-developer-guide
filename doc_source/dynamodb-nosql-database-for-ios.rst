@@ -199,7 +199,7 @@ Here's the implementation of our model.
                     var ISBN:String?
 
                     class func dynamoDBTableName() -> String {
-                        return "Book"
+                        return "Books"
                     }
 
                     class func hashKeyAttribute() -> String {
