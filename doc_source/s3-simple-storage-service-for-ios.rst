@@ -15,60 +15,41 @@ Amazon S3: Store and Retrieve Files and Data
 durable, highly-scalable object storage in the cloud. Using the AWS Mobile SDK, you can
 directly access Amazon S3 from your mobile app.
 
-The iOS SDK provides the following components to support the variety of ways the Amazon S3 service can be used in iOS apps.
+In this section:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :titlesonly:
 
-   s3transfermanager
-   s3transferutility
-   s3-pre-signed-urls
-   s3-server-side-encryption
+   Setup for Amazon S3 Integration <s3-setup-for-ios>
+   TransferManager for File Transfers <s3transfermanager>
+   TransferUtility for File and Data Transfers <s3transferutility>
+   Presigned URLs for File Access <s3-pre-signed-urls>
+   Server-side Encryption for Transfers <s3-server-side-encryption>
 
-Amazon S3 Transfer Manager
-==========================
+.. _manager-or-utility:
 
-The Amazon S3 Transfer Manager makes it easy for you to upload and download files from S3
-while optimizing for performance and reliability. S3 Transfer Manager provides simple APIs to
-pause, resume, and cancel file transfers.It hides the complexity of transferring
-files behind a simple API. Whenever possible, uploads are broken up into multiple pieces,
-so that several pieces can be sent in parallel to provide better throughput. This approach
-enables more robust transfers, since an I/O error in any individual piece means the SDK
-only needs to retransmit the one affected piece, and not the entire transfer.
+Should I Use TransferManager or TransferUtility?
+================================================
 
-Learn more at :doc:`s3transfermanager`.
+Both the Amazon S3 TransferManager and TransferUtitliy classes make it easy for you to upload and download files from Amazon S3 while optimizing for performance and reliability. Both hide the complexity of making asynchronous file transfers behind simple APIs. Both provide the ability to pause, resume, and cancel file transfers.
 
-Amazon S3 Transfer Utility
-==========================
+The differences are as follows.
 
-The AWS iOS SDK provides the Amazon S3 Transfer Utility further simplifies background
-transfer of data between your iOS app and Amazon S3. This API should be used where the
-granular control allowed by use of the Transfer Manager, in concert with pre-signed urls, is not needed.
+- Use ``TransferUtility`` to:
 
-The Amazon S3 Transfer Utility offers two main advantages over the S3 Transfer Manager:
+  - Make background file or data transfers that complete even if the system suspends an app invoking the transfer
 
-    * Ability to continue transferring data in the background without the need to explicitly use pre-signed urls
+  - Transfer binary data to a file with out saving a file at the transfer source location first.
 
-    * An API to upload binary data without first requiring it be saved as a file. The S3 Transfer Manager requires you to save data to a file before passing it to Transfer Manager.
+- Use ``TransferManager`` to make file transfers that happen while the app is in the foreground.
 
-Learn more at :doc:`s3transferutility`.
-
-Pre-signed URLs for Amazon S3 Transfers
-=======================================
-
-The iOS SDK provides Pre-signed URLs that facilitate performing data transfers in the background. Learn more at :doc:`s3-pre-signed-urls`.
-
-
-Server Side Encryption for Amazon S3
-====================================
-
-The AWS iOS SDK supports server-side encryption of Amazon S3 data. Learn more at :doc:`s3-server-side-encryption`.
+  Whenever possible, ``TransferManager`` uploads are broken up into multiple pieces. Several pieces can be sent in parallel to provide better throughput that is resilient to I/O errors.
 
 Additional Resources
 ====================
 
-For information about S3 Region availability, see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
+For information about Amazon S3 regional availability, see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
 
 * `Amazon Simple Storage Service Getting Started Guide <http://docs.aws.amazon.com/AmazonS3/latest/gsg/GetStartedWithS3.html>`_
 * `Amazon Simple Storage Service API Reference <http://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html>`_

@@ -8,217 +8,282 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-Amazon S3 Transfer Manager for iOS
+Amazon S3 TransferManager for iOS
 ##################################
 
+On this page:
+
+.. contents::
+   :local:
+   :depth: 1
+
+:guilabel:`Amazon Simple Storage Service (S3)`
+
 `Amazon Simple Storage Service (S3) <http://aws.amazon.com/s3/>`_ provides secure,
-durable, highly-scalable object storage in the cloud. Using the AWS Mobile SDK, you can
-directly access Amazon S3 from your mobile app.
+durable, highly-scalable object storage in the cloud. Using the AWS Mobile SDK for iOS, you can
+directly access Amazon S3 from your mobile app. For information about Amazon S3 regional availability,
+see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
 
-Amazon S3 Transfer Manager makes it easy for you to upload and download files from S3
+:guilabel:`TransferManager Features`
+
+Amazon S3 TransferManager class makes it easy   to upload files to and download files from Amazon S3
 while optimizing for performance and reliability. It hides the complexity of transferring
-files behind a simple API. Whenever possible, uploads are broken up into multiple pieces,
-so that several pieces can be sent in parallel to provide better throughput. This approach
-enables more robust transfers, since an I/O error in any individual piece means the SDK
-only needs to retransmit the one affected piece, and not the entire transfer.
+files behind a simple API.
 
-S3 Transfer Manager provides simple APIs to pause, resume, and cancel file transfers.
-For information about S3 Region availability, see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
+Whenever possible, uploads are broken into multiple pieces, so that several pieces are sent in
+parallel to provide better throughput. This approach enables more robust transfers, since an I/O error
+in an individual piece result in the SDK retransmitting only the faulty piece, not the
+entire transfer. ``TransferManager`` provides simple APIs to pause, resume, and cancel file transfers.
 
-Getting Started
-===============
+The following sections provide a step-by-step guide for getting started with Amazon S3 using the ``TransferManager``.
 
-This section provides a step-by-step guide for getting started with Amazon S3 using the
-AWS Mobile SDK for iOS. You can also try out the
-`Amazon S3 sample <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferManager-Sample/
-Objective-C>`_ available in the AWSLabs GitHub repository.
+You can also try out the
+`Amazon S3 sample <https://github.com/awslabs/aws-sdk-ios-samples/tree/master/S3TransferManager-Sample>`_ available in the AWSLabs GitHub repository.
 
-Get the SDK
------------
+.. admonition:: Should I Use ``TransferManager`` or ``TransferUtility``?
 
-To use S3 with your mobile app, first set up the AWS Mobile SDK for iOS:
-
-#. Download the iOS SDK and include it in your iOS project, as described at :doc:`setup-aws-sdk-for-ios`.
-#. Import the following header into your project
+    To choose which API best suits your needs, see :ref:`manager-or-utility`.
 
 
-    .. container:: option
+Setup
+=====
 
-        Swift
-            .. code-block:: swift
+To set your project up to use the ``TransferManager`` class, take the steps below.
 
-                import AWSS3
+1. Setup the SDK, Credentials and Services
+------------------------------------------
 
+    Follow the steps in :doc:`s3-setup-for-ios` install the AWS Mobile SDK for iOS and configure
+    AWS credentials and permissions.
 
-        Objective-C
-            .. code-block:: objc
+2. Import the SDK Amazon S3 APIs
+--------------------------------
 
-                #import <AWSS3/AWSS3.h>
+    Add the following import statements to your Xcode project.
 
-Configure Credentials
----------------------
+        .. container:: option
 
-Amazon Cognito lets you create unique end user identifiers for accessing AWS cloud
-services. You'll use Amazon Cognito to provide temporary AWS credentials to your app.
+            Swift
+                .. code-block:: swift
 
-Log in to the `Cognito console <https://console.aws.amazon.com/cognito/>`_.
+                    import AWSS3
 
-Create an identity pool and copy the Amazon Cognito client initialization code into your project. For more
-information on setting up the Amazon Cognito client, see `Cognito Identity Developer Guide <http://docs.aws.amazon.com/cognito/devguide/identity/>`_.
+            Objective-C
+                .. code-block:: objc
 
-Create and Configure an S3 Bucket
----------------------------------
+                    #import <AWSS3/AWSS3.h>
 
-Amazon S3 stores your resources in buckets |mdash| cloud storage containers that live in a
-specific `region <http://docs.aws.amazon.com/general/latest/gr/rande.html>`_. Each S3 bucket
-must have a globally unique name.
-
-Let's use the AWS Management Console to create an S3 bucket.
-
-Create an S3 Bucket
-^^^^^^^^^^^^^^^^^^^
-#. Sign in to the `S3 console <https://console.aws.amazon.com/s3/>`_ and click :guilabel:`Create Bucket`.
-#. Enter a bucket name, select a region, and click create.
-
-Grant Access to Your S3 Resources
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The default IAM role policy grants your application access to Amazon Mobile Analytics and Amazon Cognito Sync. In order for your Cognito identity pool to access Amazon S3, you must modify the identity pool's roles.
-
-#. Navigate to the `Identity and Access Management Console`_ and click :guilabel:`Roles` in the left-hand pane.
-#. Type your identity pool name into the search box. Two roles will be listed: one for unauthenticated users and one for authenticated users.
-#. Click the role for unauthenticated users (it will have unauth appended to your Identity Pool name).
-#. Click the :guilabel:`Create Role Policy` button, select :guilabel:`Policy Generator`, and then click the :guilabel:`Select` button.
-#. On the Edit Permissions page, enter the settings shown in the following image. The Amazon Resource Name (ARN) of an S3 bucket looks like :code:`arn:aws:s3:::examplebucket/*` and is composed of the region in which the bucket is located and the name of the bucket. The settings shown below will give your identity pool full to access to all actions for the specified bucket.
-
-    .. image:: images/edit-permissions.png
-
-6. Click the :guilabel:`Add Statement` button and then the :guilabel:`Next Step` button.
-7. The Wizard will show you the configuration that you generated. Click the :guilabel:`Apply Policy` button.
-
-For more information on granting access to S3, see `Granting Access to an Amazon S3 Bucket`_.
-
-
-Upload Files from the Console
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Let's seed the S3 bucket with a test file. We could do this programmatically, but for now
-let's just use the console.
-
-#. In the S3 console, in your bucket view, click :guilabel:`Upload`.
-#. Click :guilabel:`Add Files` and select a test file to upload. For this tutorial, we'll
-   assume you're uploading an image called :file:`myImage.jpg`.
-#. With your test image selected, click :guilabel:`Start Upload`.
-
-Create the S3 TransferManager Client
+3. Create the ``TransferManager`` Client
 ------------------------------------
 
-To use the S3 TransferManager, we first need to create a TransferManager client
+    Add the following code to create an `AWSS3TransferManager` client.
 
+        .. container:: option
 
-    .. container:: option
+            Swift
+                .. code-block:: swift
 
-        Swift
-            .. code-block:: swift
+                    let transferManager = AWSS3TransferManager.default()
 
-                let transferManager = AWSS3TransferManager.default()
+            Objective-C
+                .. code-block:: objc
 
+                    AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
 
-        Objective-C
-            .. code-block:: objc
+    The `AWSS3TransferManager` class is an entry point to this SDK's high-level Amazon S3 APIs.
 
-                AWSS3TransferManager *transferManager = [AWSS3TransferManager defaultS3TransferManager];
-
-The ``AWSS3TransferManager`` class is our entry point to the high-level S3 API.
-
-Download an Object
+Transfer an Object
 ==================
 
-To download a file from a bucket, we have to construct the request using
-``AWSS3TransferManagerDownloadRequest``. We then pass this request to the ``download`` method
-of our client.
+In this section:
 
-In the following snippet, we create an ``NSURL`` that we'll use for a download location.
-Then we create a new download request object and set three properties on it:
-the bucket name, the key (the name of the object in the bucket), and the URL where the file will be downloaded
-(``downloadingFileURL``).
+.. contents::
+   :local:
+   :depth: 1
+
+Downloading a file from and uploading a file to a bucket, use the same coding pattern. An important
+difference is that `download:` does not succeed until the download is complete, blocking any flow that
+depends on that success. Upload returns immediately and can therefore be safely called on the
+main thread.
+
+The steps to call ``TransferManager`` for a transfer are as follows.
+
+1. Create an ``AWSS3TransferManagerDownloadRequest``
+--------------------------------------------------
+
+    The following code illustrates the three actions needed to create a download request:
+
+        - Create a destination/source location for the file. In this example, this is
+          called ``downloadingFileURL`` / ``uploadingFileURL``.
+
+        - Construct a request object using ``AWSS3TransferManagerDownloadRequest``.
+
+        - Set three properties of the request object: the bucket name; the key (the name of
+          the object in the bucket); and the download destination / upload source
+          ``downloadingFileURL`` / ``uploadingFileURL``.
+
+        :guilabel:`Download`
+
+        .. container:: option
+
+            Swift
+                .. code-block:: swift
+
+                    let downloadingFileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("myImage.jpg")
+
+                    let downloadRequest = AWSS3TransferManagerDownloadRequest()
+
+                    downloadRequest.bucket = "myBucket"
+                    downloadRequest.key = "myImage.jpg"
+                    downloadRequest.downloadingFileURL = downloadingFileURL
+
+            Objective-C
+                .. code-block:: objc
+
+                    NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"myImage.jpg"];
+                    NSURL *downloadingFileURL = [NSURL fileURLWithPath:downloadingFilePath];
+
+                    AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
+
+                    downloadRequest.bucket = @"myBucket";
+                    downloadRequest.key = @"myImage.jpg";
+                    downloadRequest.downloadingFileURL = downloadingFileURL;
 
 
-    .. container:: option
+        :guilabel:`Upload`
 
-        Swift
-            .. code-block:: swift
+        .. container:: option
 
-                let downloadingFileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("myImage.jpg")
+            Swift
+                .. code-block:: swift
 
-                let downloadRequest = AWSS3TransferManagerDownloadRequest()
-                downloadRequest.bucket = "myBucket"
-                downloadRequest.key = "myImage.jpg"
-                downloadRequest.downloadingFileURL = downloadingFileURL
+                    let uploadingFileURL = URL(fileURLWithPath: "your/file/path/myTestFile.txt")
 
-        Objective-C
-            .. code-block:: objc
+                    let uploadRequest = AWSS3TransferManagerUploadRequest()
 
-                // Construct the NSURL for the download location.
-                NSString *downloadingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"myImage.jpg"];
-                NSURL *downloadingFileURL = [NSURL fileURLWithPath:downloadingFilePath];
+                    uploadRequest.bucket = "myBucket"
+                    uploadRequest.key = "myTestFile.txt"
+                    uploadRequest.body = uploadingFileURL
 
-                // Construct the download request.
-                AWSS3TransferManagerDownloadRequest *downloadRequest = [AWSS3TransferManagerDownloadRequest new];
+            Objective-C
+                .. code-block:: objc
 
-                downloadRequest.bucket = @"myBucket";
-                downloadRequest.key = @"myImage.jpg";
-                downloadRequest.downloadingFileURL = downloadingFileURL;
+                    NSURL *uploadingFileURL = [NSURL fileURLWithPath: "your/file/path/myTestFile.txt"];
 
-Now we can pass the download request to the ``download:`` method of the TransferManager client.
-The AWS Mobile SDK for iOS uses `AWSTask` to support
-asynchronous calls to Amazon Web Services. The ``download:`` method is asynchronous and returns a
-``AWSTask`` object, so we'll use it accordingly.
+                    AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
+
+                    uploadRequest.bucket = @"myBucket";
+                    uploadRequest.key = @"myTestFile.txt";
+                    uploadRequest.body = uploadingFileURL;
 
 
-    .. container:: option
+2. Pass the Request to the `download:` Method
+---------------------------------------------
 
-        Swift
-            .. code-block:: swift
+    Use the following code to pass the request to the `download:` / `upload:" method of the
+    ``TransferManager`` client. The methods are asynchronous and returns an `AWSTask` object. Use a
+    `continueWith` block to handle the method result.  For more information about `AWSTask`,
+    see :doc:`awstask`.
 
-                transferManager.download(downloadRequest).continueWith(executor: AWSExecutor.mainThread(), block: { (task:AWSTask<AnyObject>) -> Any? in
+        :guilabel:`Download`
 
-                    if let error = task.error as? NSError {
-                        if error.domain == AWSS3TransferManagerErrorDomain, let code = AWSS3TransferManagerErrorType(rawValue: error.code) {
-                            switch code {
-                            case .cancelled, .paused:
-                                break
-                            default:
+        .. container:: option
+
+            Swift
+                .. code-block:: swift
+
+                    transferManager.download(downloadRequest).continueWith(executor: AWSExecutor.mainThread(), block: { (task:AWSTask<AnyObject>) -> Any? in
+
+                        if let error = task.error as? NSError {
+                            if error.domain == AWSS3TransferManagerErrorDomain, let code = AWSS3TransferManagerErrorType(rawValue: error.code) {
+                                switch code {
+                                case .cancelled, .paused:
+                                    break
+                                default:
+                                    print("Error downloading: \(downloadRequest.key) Error: \(error)")
+                                }
+                            } else {
                                 print("Error downloading: \(downloadRequest.key) Error: \(error)")
                             }
-                        } else {
-                            print("Error downloading: \(downloadRequest.key) Error: \(error)")
+                            return nil
                         }
+                        print("Download complete for: \(downloadRequest.key)")
+                        let downloadOutput = task.result
                         return nil
-                    }
-                    print("Download complete for: \(downloadRequest.key)")
-                    let downloadOutput = task.result
-                    return nil
-                })
+                    })
 
-        Objective-C
-            .. code-block:: objc
+            Objective-C
+                .. code-block:: objc
 
-                // Download the file.
-                [[transferManager download:downloadRequest ] continueWithExecutor:[AWSExecutor mainThreadExecutor]
-                    withBlock:^id(AWSTask *task) {
-                    if (task.error){
+                    [[transferManager download:downloadRequest ] continueWithExecutor:[AWSExecutor mainThreadExecutor]
+                        withBlock:^id(AWSTask *task) {
+                        if (task.error){
+                            if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
+                                switch (task.error.code) {
+                                    case AWSS3TransferManagerErrorCancelled:
+                                    case AWSS3TransferManagerErrorPaused:
+                                    break;
+
+                                    default:
+                                        NSLog(@"Error: %@", task.error);
+                                        break;
+                                }
+
+                            } else {
+                                NSLog(@"Error: %@", task.error);
+                            }
+                        }
+
+                        if (task.result) {
+                            AWSS3TransferManagerDownloadOutput *downloadOutput = task.result;
+                        }
+                        return nil;
+                    }];
+
+        :guilabel:`Upload`
+
+        .. container:: option
+
+            Swift
+                .. code-block:: swift
+
+                    transferManager.upload(uploadRequest).continueWith(executor: AWSExecutor.mainThread(), block: { (task:AWSTask<AnyObject>) -> Any? in
+
+                        if let error = task.error as? NSError {
+                            if error.domain == AWSS3TransferManagerErrorDomain, let code = AWSS3TransferManagerErrorType(rawValue: error.code) {
+                                switch code {
+                                case .cancelled, .paused:
+                                    break
+                                default:
+                                    print("Error uploading: \(uploadRequest.key) Error: \(error)")
+                                }
+                            } else {
+                                print("Error uploading: \(uploadRequest.key) Error: \(error)")
+                            }
+                            return nil
+                        }
+
+                        let uploadOutput = task.result
+                        print("Upload complete for: \(uploadRequest.key)")
+                        return nil
+                    })
+
+            Objective-C
+                .. code-block:: objc
+
+                    [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor]
+                                withBlock:^id(AWSTask *task) {
+                    if (task.error) {
                         if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
                             switch (task.error.code) {
                                 case AWSS3TransferManagerErrorCancelled:
                                 case AWSS3TransferManagerErrorPaused:
-                                break;
+                                    break;
 
                                 default:
                                     NSLog(@"Error: %@", task.error);
                                     break;
                             }
-
                         } else {
                             // Unknown error.
                             NSLog(@"Error: %@", task.error);
@@ -226,134 +291,53 @@ asynchronous calls to Amazon Web Services. The ``download:`` method is asynchron
                     }
 
                     if (task.result) {
-                        AWSS3TransferManagerDownloadOutput *downloadOutput = task.result;
-                        //File downloaded successfully.
+                        AWSS3TransferManagerUploadOutput *uploadOutput = task.result;
+                        // The file uploaded successfully.
                     }
                     return nil;
                 }];
 
+3. Displaying a Downloaded Image in an UIImageView
+--------------------------------------------------
 
-In the example above, ``withBlock:`` is executed on the main thread.
+    The use of `download:` in this example is executed on the main thread. The following code illustrates
+    displaying such an image in a `UIImageView` configured in your project .
 
-We can display the downloaded image in a ``UIImageView``. Assuming ``UIImageView`` has been implemented,
-we can do this as follows.
+    Note that it can only succeed after download of the file it displays has completed.
 
-    .. container:: option
+        .. container:: option
 
-        Swift
-            .. code-block:: swift
+            Swift
+                .. code-block:: swift
 
-                self.imageView.image = UIImage(contentsOfFile: downloadingFileURL.path)
-
-
-        Objective-C
-            .. code-block:: objc
-
-                self.imageView.image = [UIImage imageWithContentsOfFile:downloadingFilePath];
-
-Note: in order for this image to display, we have to wait for the download to finish.
-
-Upload an Object
-================
-
-Uploading an object with the S3 TransferManager is similar to downloading one. First we construct a
-request object and then pass that request object the TransferManager client.
-For the purposes of this example, let's say that we have an ``NSURL`` object, ``testFileURL``, that
-represents the file we want to upload. We can build the request using ``AWSS3TransferManagerUploadRequest``,
-as shown below.
-
-    .. container:: option
-
-        Swift
-            .. code-block:: swift
-
-                let uploadRequest = AWSS3TransferManagerUploadRequest()
-                uploadRequest.bucket = "myBucket"
-                uploadRequest.key = "myTestFile.txt"
-                uploadRequest.body = URL(fileURLWithPath: "your/file/path/myTestFile.txt")
-
-        Objective-C
-            .. code-block:: objc
-
-                AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
-                uploadRequest.bucket = @"myBucket";
-                uploadRequest.key = @"myTestFile.txt";
-                uploadRequest.body = testFileURL;
-
-As with a download request, the ``key`` value will be the name of the object in the S3 bucket.
-The ``body`` property of the request takes an ``NSURL`` object.
-
-Having created the request, we can now pass it to the ``upload`` method of the TransferManager
-client. The ``upload`` method returns a ``AWSTask`` object, so we'll again use
-``continueWithExecutor:withBlock:`` to handle the upload.
-
-    .. container:: option
-
-        Swift
-            .. code-block:: swift
-
-                transferManager.upload(uploadRequest).continueWith(executor: AWSExecutor.mainThread(), block: { (task:AWSTask<AnyObject>) -> Any? in
-
-                    if let error = task.error as? NSError {
-                        if error.domain == AWSS3TransferManagerErrorDomain, let code = AWSS3TransferManagerErrorType(rawValue: error.code) {
-                            switch code {
-                            case .cancelled, .paused:
-                                break
-                            default:
-                                print("Error uploading: \(uploadRequest.key) Error: \(error)")
-                            }
-                        } else {
-                            print("Error uploading: \(uploadRequest.key) Error: \(error)")
-                        }
-                        return nil
-                    }
-
-                    let uploadOutput = task.result
-                    print("Upload complete for: \(uploadRequest.key)")
-                    return nil
-                })
-
-        Objective-C
-            .. code-block:: objc
-
-                [[transferManager upload:uploadRequest] continueWithExecutor:[AWSExecutor mainThreadExecutor]
-                            withBlock:^id(AWSTask *task) {
-                if (task.error) {
-                    if ([task.error.domain isEqualToString:AWSS3TransferManagerErrorDomain]) {
-                        switch (task.error.code) {
-                            case AWSS3TransferManagerErrorCancelled:
-                            case AWSS3TransferManagerErrorPaused:
-                                break;
-
-                            default:
-                                NSLog(@"Error: %@", task.error);
-                                break;
-                        }
-                    } else {
-                        // Unknown error.
-                        NSLog(@"Error: %@", task.error);
-                    }
-                }
-
-                if (task.result) {
-                    AWSS3TransferManagerUploadOutput *uploadOutput = task.result;
-                    // The file uploaded successfully.
-                }
-                return nil;
-            }];
+                    self.imageView.image = UIImage(contentsOfFile: downloadingFileURL.path)
 
 
-Note that ``upload:`` is an asynchronous method and returns immediately. Since it doesn't
-block the running thread, it's safe to call this method on the main thread.
+            Objective-C
+                .. code-block:: objc
+
+                    self.imageView.image = [UIImage imageWithContentsOfFile:downloadingFilePath];
+
+
 
 Pause, Resume, and Cancel Object Transfers
 ==========================================
 
-The TransferManager supports pause, resume, and cancel operations for both
-uploads and downloads. ``pause``, ``cancel``, ``resumeAll``, ``cancelAll``, ``pauseAll``,
-``upload:``, and ``download:`` all return instances of ``AWSTask``. Thus, you should
-use these methods with a ``continueWithBlock`` to catch any errors. For example, a ``pause``
-operation might look like this.
+In this section:
+
+.. contents::
+   :local:
+   :depth: 1
+
+The ``TransferManager`` supports pause, resume, and cancel operations for both
+uploads and downloads. The `pause`, `cancel`, `resumeAll`, `cancelAll`, `pauseAll`,
+`upload:`, and `download:` operations all return instances of `AWSTask`. Use these methods with a
+`continueWith` `block:` to handle the returns of these operations.
+
+Use continueWith Block to Handle Results
+----------------------------------------
+
+The following code illustrates using `continueWith` `block:` when calling the `pause` method.
 
     .. container:: option
 
@@ -378,14 +362,19 @@ operation might look like this.
                     if (task.error) {
                         NSLog(@"Error: %@",task.error);
                     } else {
-                        //Pause the upload.
+
                     }
+
+                    // Upload has been paused.
                     return nil;
                 }];
 
-For the sake of brevity, the examples below omit the ``continueWithBlock``.
+For brevity, the following examples omit the `continueWithBlock`.
 
-To pause an object transfer, call ``pause`` on the request object.
+Pause a Transfer
+----------------
+
+To pause an object transfer, call `pause` on the request object.
 
     .. container:: option
 
@@ -402,8 +391,11 @@ To pause an object transfer, call ``pause`` on the request object.
                 [uploadRequest pause];
                 [downloadRequest pause];
 
-To resume a transfer, call ``upload`` or ``download``, as appropriate, and pass in
-the paused request.
+Resume a Transfer
+----------------
+
+To resume a transfer, call `upload` or `download` and pass in
+the paused request object.
 
     .. container:: option
 
@@ -420,7 +412,10 @@ the paused request.
                 [transferManager upload:uploadRequest];
                 [transferManager download:downloadRequest];
 
-To cancel a transfer, call ``cancel`` on the upload or download request.
+Cancel a Transfer
+----------------
+
+To cancel a transfer, call `cancel` on the upload or download request.
 
     .. container:: option
 
@@ -437,8 +432,10 @@ To cancel a transfer, call ``cancel`` on the upload or download request.
                 [uploadRequest cancel];
                 [downloadRequest cancel];
 
-You can also perform pause, resume, and cancel operations in batches. To pause all of the current
-upload and download requests, call ``pauseAll`` on the TransferManager.
+Pause All Transfers
+-------------------
+
+To pause all of the current upload and download requests, call `pauseAll` on the ``TransferManager``.
 
     .. container:: option
 
@@ -452,9 +449,12 @@ upload and download requests, call ``pauseAll`` on the TransferManager.
 
                 [transferManager pauseAll];
 
-To resume all of the current upload and download requests, call ``resumeAll`` on the TransferManager
-and pass in an ``AWSS3TransferManagerResumeAllBlock``, which can be used to reset the progress
-blocks for the requests.
+Resume All Transfers
+--------------------
+
+To resume all of the current upload and download requests, call `resumeAll` on the ``TransferManager``
+passing an `AWSS3``TransferManager``ResumeAllBlock`, which is a closure that takes `AWSRequest` as a parameter, and
+can be used to reset the progress blocks for the requests.
 
     .. container:: option
 
@@ -462,7 +462,7 @@ blocks for the requests.
             .. code-block:: swift
 
                 transferManager.resumeAll({ (request:AWSRequest?) in
-                    // All paused requests have resumed.
+                   // All paused requests have resumed.
                 })
 
 
@@ -470,10 +470,13 @@ blocks for the requests.
             .. code-block:: objc
 
                 [transferManager resumeAll:^(AWSRequest *request) {
-                    //Resume paused requests.
+                    // All paused requests have resumed.
                 }];
 
-To cancel all upload and download requests, call ``cancelAll`` on the TransferManager.
+Cancel All Transfers
+--------------------
+
+To cancel all upload and download requests, call `cancelAll` on the TransferManager.
 
     .. container:: option
 
@@ -490,64 +493,68 @@ To cancel all upload and download requests, call ``cancelAll`` on the TransferMa
 Track Progress
 ==============
 
-Using the ``uploadProgress`` and ``downloadProgress`` blocks, you can track the progress of
-object transfers. These blocks work in conjunction with the Grand Central Dispatch ``dispatch_async`` function,
-as shown in the examples below.
+Using the `uploadProgress` and `downloadProgress` blocks, you can track the progress of
+object transfers. These blocks work in conjunction with the Grand Central Dispatch `dispatch_async` function,
+as shown in the following examples.
 
-Track the progress of an upload.
+    Upload Progress
+    ---------------
 
-    .. container:: option
+    Track the progress of an upload.
 
-        Swift
-            .. code-block:: swift
+        .. container:: option
 
-                    uploadRequest.uploadProgress = {(bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void in
+            Swift
+                .. code-block:: swift
+
+                        uploadRequest.uploadProgress = {(bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void in
+                            DispatchQueue.main.async(execute: {() -> Void in
+                                //Update progress
+                            })
+                        }
+
+            Objective-C
+                .. code-block:: objc
+
+                    uploadRequest.uploadProgress =  ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend){
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                         //Update progress
+                    });
+
+    Download Progress
+    ---------------
+
+    Track the progress of a download.
+
+        .. container:: option
+
+            Swift
+                .. code-block:: swift
+
+                    downloadRequest.downloadProgress = {(bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void in
                         DispatchQueue.main.async(execute: {() -> Void in
-                            //Update progress.
+                            //Update progress
                         })
                     }
 
-        Objective-C
-            .. code-block:: objc
+            Objective-C
+                .. code-block:: objc
 
-                uploadRequest.uploadProgress =  ^(int64_t bytesSent, int64_t totalBytesSent, int64_t totalBytesExpectedToSend){
+                    downloadRequest.downloadProgress = ^(int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
                     dispatch_async(dispatch_get_main_queue(), ^{
-                    //Update progress.
-                });
-
-Track the progress of a download.
-
-    .. container:: option
-
-        Swift
-            .. code-block:: swift
-
-
-                downloadRequest.downloadProgress = {(bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) -> Void in
-                    DispatchQueue.main.async(execute: {() -> Void in
-                        //Update progress.
-                    })
-                }
-
-
-        Objective-C
-            .. code-block:: objc
-
-                downloadRequest.downloadProgress = ^(int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    //Update progress
-                });
+                            //Update progress
+                    });
 
 Multipart Upload
 ================
 
-S3 provides a multipart upload feature that lets you upload a single object as a set of parts.
-Each part is a contiguous portion of the object's data, and the object parts are uploaded
+Amazon S3 provides a multipart upload feature to upload a single object as a set of parts.
+Each part is a contiguous portion of the object's data. The object parts are uploaded
 independently and in any order. If transmission of any part fails, you can retransmit that part
-without affecting other parts. After all parts of the object are uploaded, S3 assembles
+without affecting other parts. After all parts of the object are uploaded, Amazon S3 assembles
 these parts and creates the object.
 
-In the AWS Mobile SDK for iOS, the S3 TransferManager handles multipart upload for you. The
+In the AWS Mobile SDK for iOS, the ``TransferManager`` handles multipart upload for you. The
 minimum part size for a multipart upload is 5MB.
 
 Additional Resources

@@ -12,13 +12,71 @@
 AWS Lambda: Execute Code On Demand
 #####################################
 
-AWS Lambda is a compute service that runs your code in response to events and automatically manages the compute resources for you, making it easy to build applications that respond quickly to new information. AWS Lambda functions can be called directly from mobile, IoT, and Web apps and send a response back synchronously, making it easy to create scalable, secure, and highly available backends for your mobile apps without the need to provision or manage infrastructure. For more information, see `AWS Lambda <http://aws.amazon.com/lambda/>`_.
+On this page:
 
-The Mobile SDK for iOS enables you to call AWS Lambda functions from your iOS mobile apps, using the lambdainvoker class. When invoked from the Mobile SDK, AWS Lambda functions receive data about the device and the end user identity through a client and identity context object, making it easy to create rich, and personalized app experiences. To learn more about the data available within the client and identity context, see :ref:`clientContext` and :ref:`identityContext`.
+.. contents::
+   :local:
+   :depth: 1
 
-The following describes step-by-step instructions for integrating the AWS Mobile SDK for iOS into your app.
+:guilabel:`Amazon Lambda`
 
-To use the LambdaInvoker API, use the following import statement:
+The `AWS Lambda <http://aws.amazon.com/lambda/>`_ service makes it easy to create scalable, secure, and highly available backends for your mobile apps without the need to provision or manage infrastructure.
+
+You can create secure logical functions in the cloud that can be called directly from your iOS app. Your AWS Lambda code, written in C#, Node.js, Python, or Java, can implement standalone logic, extend your app to a range of AWS services, and/or connect to services and applications external to AWS.
+
+The availability and cost of a AWS Lambda function automatically scales to amount of traffic it receives. Functions can also be accessed from an iOS app through `Amazon API Gateway <http://aws.amazon.com/lambda/>`_, giving features like global provisioning, enterprise grade monitoring, throttling and control of access.
+
+Setup
+=====
+
+This section provides a step-by-step guide for getting started with AWS Lambda using the AWS Mobile SDK for iOS.
+
+#. Install the SDK
+
+   Add the AWS SDK for iOS to your project and import the APIs you need, by following the steps described
+   in :doc:`setup-aws-sdk-for-ios`.
+
+#. Configure Credentials
+
+   To use Amazon Cognito to create AWS identities and credentials that give your users access to your app's AWS resources, follow the steps described at :doc:`cognito-auth-aws-identity-for-ios`.
+
+#. Create and Configure a Lamda Function
+
+    #. Sign in to the `AWS Lambda console <https://console.aws.amazon.com/lambda/>`_.
+
+    #. Choose :guilabel:`Create a Lamda function`.
+
+    #. Choose the :guilabel:`Blank Function` template.
+
+       Note that dozens of function templates that connect to other AWS services are available.
+
+    #. Choose :guilabel:`Next`.
+
+       Note that the console allows you to configure triggers for a function from other AWS services, these won't be used in this walkthrough.
+
+    #. Type a :guilabel:`Name` and select `Node.js` as the :guilabel:`Runtime` language.
+
+    #. Under :guilabel:`Lambda function handler and role`, select :guilabel:`Create new role from template(s)`.
+       Type a :guilabel:`Role name`. Select the :guilabel:`Policy template` named :guilabel:`Simple Microservice permissions`.
+
+    #. Choose :guilabel:`Next`.
+
+    #. Choose :guilabel:`Create function`.
+
+
+Invoking an AWS Lambda Function
+=================================
+
+The SDK enables you to call AWS Lambda functions from your iOS mobile apps,
+using the `AWSLambdaInvoker <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSLambdaInvoker.html>`_ class. When invoked from this SDK, AWS Lambda functions receive
+data about the device and the end user identity through client and identity context objects.
+To learn more about using these contexts to create rich, and personalized app experiences,
+see :ref:`clientContext` and :ref:`identityContext`.
+
+Import AWS Lambda API
+----------------------
+
+To use the `lambdainvoker` API, use the following import statement:
 
     .. container:: option
 
@@ -32,18 +90,22 @@ To use the LambdaInvoker API, use the following import statement:
 
                 #import <AWSLambda/AWSLambda.h>
 
-Invoking a AWS Lambda Function
-=================================
 
-AWSLambdaInvoker provides a high-level abstraction for AWS Lambda. When invokeFunction/:JSONObject/: is invoked, the JSON object is serialized into JSON data and sent to the AWS Lambda service. AWS Lambda returns a JSON encoded response that is deserialized into a JSON object.
+Call lambdaInvoker
+------------------
+
+``AWSLambdaInvoker`` provides a high-level abstraction for AWS Lambda. When ``invokeFunction``
+``JSONObject`` is invoked, the JSON object is serialized into JSON data and sent to the
+AWS Lambda service. AWS Lambda returns a JSON encoded response that is deserialized into
+a JSON object.
 
 A valid JSON object must have the following properties:
 
-* All objects are instances of `NSString`, `NSNumber`, `NSArray`, `NSDictionary`, or `NSNull`.
-* All dictionary keys are instances of `NSString`.
-* Numbers are not `NaN` or `infinity`.
+* All objects are instances of string, number, array, dictionary or null objects.
+* All dictionary keys are instances of string objects.
+* Numbers are not ``NaN`` or ``infinity``.
 
-For example, it is an example of valid request.
+The following is an example of valid request.
 
     .. container:: option
 
@@ -83,7 +145,11 @@ For example, it is an example of valid request.
                     return nil;
                 }];
 
-On successful execution, `task.result` contains a JSON object. For instance, if `myFunctions` returns a dictionary, you can cast the result to an `NSDictionary` as follows.
+
+Using function returns
+----------------------
+
+On successful execution, `task.result` contains a JSON object. For instance, if `myFunctions` returns a dictionary, you can cast the result to a dictionary object as follows.
 
     .. container:: option
 
@@ -104,21 +170,24 @@ On successful execution, `task.result` contains a JSON object. For instance, if 
                     NSLog(@"result: %@", JSONObject[@"resultKey"]);
                 }
 
-On failed AWS Lambda service execution, `task.error` may contain an `NSError` with `AWSLambdaErrorDomain` domain and the following error code.
+Handling service execution errors
+---------------------------------
+
+On failed AWS Lambda service execution, `task.error` may contain a `NSError` with `AWSLambdaErrorDomain` domain and the following error code.
 
     * `AWSLambdaErrorUnknown`
     * `AWSLambdaErrorService`
     * `AWSLambdaErrorResourceNotFound`
     * `AWSLambdaErrorInvalidParameterValue`
 
-On failed function execution, `task.error` may contain an `NSError` with `AWSLambdaInvokerErrorDomain` domain and the following error code:
+On failed function execution, `task.error` may contain a `NSError` with `AWSLambdaInvokerErrorDomain` domain and the following error code:
 
     * `AWSLambdaInvokerErrorTypeUnknown`
     * `AWSLambdaInvokerErrorTypeFunctionError`
 
 When `AWSLambdaInvokerErrorTypeFunctionError` error code is returned, `error.userInfo` may contain a function error from your AWS Lambda function with `AWSLambdaInvokerFunctionErrorKey` key.
 
-Here is an example code snippet.
+The following code shows error handling.
 
     .. container:: option
 
@@ -145,7 +214,10 @@ Here is an example code snippet.
                     }
                 }
 
-With everything put together, here is a complete code snippet.
+Comprehensive example
+---------------------
+
+The following code shows invoking an AWS Lambda call and handling returns and errors all together.
 
     .. container:: option
 
@@ -208,7 +280,8 @@ With everything put together, here is a complete code snippet.
 Client Context
 ==============
 
-When invoked through the SDK, AWS Lambda functions have access to the data about the device and the app using the ClientContext class. When you use Amazon Cognito as a credential provider, access to the end user identity is available using the IdentityContext class.
+Calls to AWS Lambda using this SDK provide your functions with data about the calling device
+and app using the `ClientContext` class.
 
 You can access the client context in your lambda function as follows.
 
@@ -269,7 +342,7 @@ env.locale
 Identity Context
 ================
 
-To invoke AWS Lambda function from your mobile app, you can leverage Amazon Cognito as the credential provider. You can learn more about Amazon Cognito here. Amazon Cognito assigns each user a unique Identity ID. This Identity ID is available to you in the AWS Lambda functions invoked through the AWS Mobile SDK. You can access the Identity ID as follows.
+The `IdentityContext` class of the SDK passes Amazon Cognito credentials making the AWS identity of the end user available to your function. You can access the Identity ID as follows.
 
     .. container:: option
 
@@ -282,6 +355,6 @@ To invoke AWS Lambda function from your mobile app, you can leverage Amazon Cogn
                     context.succeed("Your client ID is " + context.identity);
                 }
 
-For more information about Identity ID, see `Amazon Cognito Identity <http://docs.aws.amazon.com/mobile/sdkforandroid/developerguide/cognito-auth.html>`_.
+For more about Amazon Cognito in the AWS Mobile SDK for iOS, see :doc:`cognito-auth-aws-identity-for-ios`.
 
 .. _Cognito Console: https://console.aws.amazon.com/cognito/home

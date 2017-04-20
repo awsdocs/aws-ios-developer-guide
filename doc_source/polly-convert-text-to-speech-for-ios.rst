@@ -10,9 +10,9 @@
 
 .. highlight:: java
 
-###############################################################
-Add Text to Speech Capability to your iOS App with Amazon Polly
-###############################################################
+#######################################
+Amazon Polly: Text to Speech Conversion
+#######################################
 
 What is Amazon Polly?
 =====================

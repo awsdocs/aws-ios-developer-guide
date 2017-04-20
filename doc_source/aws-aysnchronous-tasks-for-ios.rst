@@ -8,24 +8,75 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-Working with AWSTask
-####################
+Working with Asynchronous Tasks
+###############################
 
-To work with asynchronous operations without blocking the UI thread, the SDK provides AWSTask objects.
+To work with asynchronous operations without blocking the UI thread, the SDK provides two options:
 
-The ``AWSTask`` class is a renamed version of BFTask from the Bolts framework. For complete
-documentation on Bolts, see the `Bolts-iOS repo <https://github.com/BoltsFramework/Bolts-ObjC>`_.
+    - ``completionHandler``, a streamlined class which offers a simple, common pattern for most API calls
 
-What is AWSTask?
-----------------
+and
+
+    - ``AWSTask``, a class which is a renamed version of BFTask from the Bolts framework. AWSTasks
+      gives advantages for more complex operations like chaining asynchronous requests.
+
+      For complete documentation on Bolts, see the
+      `Bolts-ObjC repo <https://github.com/BoltsFramework/Bolts-ObjC>`_.
+
+.. _completionHandler:
+
+Using completionHandler
+=======================
+
+Most simple asynchronous API method calls can use ``completionHandler`` to handle
+method callbacks. When an asynchrous method is complete, ``completionHandler`` returns two parts: a response
+object containing the method's return if the call was successful, or ``nil`` if failed; and an error object containing the ``NSError`` state when a call fails, or ``nil`` upon success.
+
+Handling Asynchronous Method Returns with completionHandler
+-----------------------------------------------------------
+
+The following code shows typical usage of ``completionHandler`` using Amazon Kinesis Firehose as the example.
+
+   .. container:: option
+
+        Swift
+            .. code-block:: swift
+
+                var firehose = AWSFirehose.default()
+                firehose.putRecord(AWSFirehosePutRecordInput(), completionHandler: {(_ response: AWSFirehosePutRecordOutput?, _ error: Error?) -> Void in
+                    if error != nil {
+                        //handle error
+                    }
+                    else {
+                        //handle response
+                    }
+                })
+
+        Objective-C
+            .. code-block:: objc
+
+                AWSFirehose *firehose = [AWSFirehose defaultFirehose];
+
+                [firehose putRecord:[AWSFirehosePutRecordInput new] completionHandler:^(AWSFirehosePutRecordOutput* _Nullable response, NSError * _Nullable error) {
+                       if(error){
+                        //handle error
+                       }else{
+                        //handle response
+                       }
+                    }];
+
+.. _awstask:
+
+Using AWSTask
+=============
 
 An ``AWSTask`` object represents the result of an asynchronous method. Using ``AWSTask``,
-you can wait for an asynchronous method to return a value, and then do something with that
+you can wait for an asynchronous method to return a value, and then something with that
 value after it has returned. You can chain asynchronous requests instead of nesting them. This
 helps keep logic clean and code readable.
 
-Handle Returns for Asynchronous Methods
-------------------------------------------------
+Handling Asynchronous Method Returns with AWSTask
+-------------------------------------------------
 
 The following code shows how to use ``continueOnSuccessBlockWith:`` and ``continueWith:`` to handle methods calls
 that return an ``AWSTask`` object.
@@ -72,8 +123,8 @@ The ``submitAllRecords`` call is made within the ``continueOnSuccessWith`` /
 and ``continueOnSuccessWith`` won't run until the previous asynchronous call finishes.
 In this example, ``submitAllRecords`` is guaranteed to see the result of ``saveRecord:streamName:``.
 
-Handling Errors
----------------
+Handling Errors with AWSTask
+----------------------------
 
 The ``continueWith:``   and ``continueOnSuccessWith:`` block calls work in similar ways. Both ensure
 that the previous asynchronous method finishes executing before the subsequent block runs. However, they
@@ -114,13 +165,13 @@ For example, consider the following scenarios, which refer to the preceding code
         5. Done.
 
 
-Consolidated Error Logic
-^^^^^^^^^^^^^^^^^^^^^^^^
+Consolidated Error Logic with AWSTask
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The preceding example consolidates error handling logic at the end of the execution chain for both methods called. It doesn't check for ``task.error`` in ``continueOnSuccessBlockWith:``, but waits until the ``continueWith:`` block executes to do so. An error from either the ``submitAllRecords`` or the ``saveRecord:streamName:`` method will be printed.
 
-Per Method Error Logic
-^^^^^^^^^^^^^^^^^^^^^^
+Per Method Error Logic with AWSTask
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following code shows how to implement the same behavior, but makes error handling specific to each method. ``submitAllRecords`` is only called if ``saveRecord:streamName`` succeeds, however, in this case, the ``saveRecord:streamName`` call uses ``continueWith:``, the block logic checks ``task.error`` and returns nil upon error. If that block succeeds then ``submitAllRecords`` is called using  ``continueWith:`` in a block that also checks ``task.error`` for its own context.
 
@@ -175,13 +226,13 @@ Returning AWSTask or nil
 
 Remember to return either an ``AWSTask`` object or ``nil`` in every usage of ``continueWith:`` and ``continueOnSuccessWith:``. In most cases, Xcode provides a warning if there is no valid return present, but in some cases an undefined error can occur.
 
-Executing Multiple Tasks
-------------------------
+Executing Multiple Tasks with AWSTask
+-------------------------------------
 
 If you want to execute a large number of operations, you have two options: executing in sequence or executing in parallel.
 
 In Sequence
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 You can  submit 100 records to an Amazon Kinesis stream in sequence as follows:
 
@@ -236,7 +287,7 @@ In this case, the key is to concatenate a series of tasks by reassigning ``task`
                 task = [task continueWithSuccessBlock:^id(AWSTask *task) {
 
 In Parallel
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 You can execute multiple methods in parallel by using ``taskForCompletionOfAllTasks:`` as follows.
 
@@ -279,8 +330,8 @@ You can execute multiple methods in parallel by using ``taskForCompletionOfAllTa
 
 In this example you create an instance of ``NSMutableArray``, put all of our tasks in it, and then pass it to ``taskForCompletionOfAllTasks:``, which is successful only when all of the tasks are successfully executed. This approach may be faster, but it may consume more system resources. Also, some AWS services, such as Amazon DynamoDB, throttle a large number of certain requests. Choose a sequential or parallel approach based on your use case.
 
-Executing a Block on the Main Thread
-------------------------------------
+Executing a Block on the Main Thread with AWSTask
+-------------------------------------------------
 
 By default, ``continueWithBlock:`` and ``continueWithSuccessBlock:`` are executed on a background thread. But in some cases (for example, updating a UI component based on the result of a service call), you need to execute an operation on the main thread. To execute an operation on the main thread, you can use Grand Central Dispatch or ``AWSExecutor``.
 

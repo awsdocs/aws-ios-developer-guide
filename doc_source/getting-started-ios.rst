@@ -20,7 +20,7 @@ The AWS SDK for iOS provides the libraries, samples and, documentation needed to
 
    setup-aws-sdk-for-ios
    cognito-auth-aws-identity-for-ios
-   awstask
+   aws-aysnchronous-tasks-for-ios
    ats
 
 For more information about the AWS SDK for iOS see :doc:`Welcome`.

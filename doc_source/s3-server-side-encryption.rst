@@ -14,14 +14,14 @@ Amazon S3 Server-Side Encryption Support in iOS
 The AWS Mobile SDK for iOS supports server-side encryption of Amazon S3 data. To learn more about server-side
 encryption, see `PUT Object <http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUT.html>`_.
 
-Use the following properties to configure the encryption:
+The following properties are available to configure the encryption:
 
 * `SSECustomerAlgorithm <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSS3ReplicateObjectOutput.html#//api/name/SSECustomerAlgorithm>`_
 * `SSECustomerKey <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSS3UploadPartRequest.html#//api/name/SSECustomerKey>`_
 * `SSECustomerKeyMD5 <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSS3PutObjectOutput.html#//api/name/SSECustomerKeyMD5>`_
 * `AWSS3ServerSideEncryption <http://docs.aws.amazon.com/AWSiOSSDK/latest/Constants/AWSS3ServerSideEncryption.html>`_
 
-To use these properties, you'll need to import ``AWSSS3Model``.
+To use these properties, import the ``AWSSS3Model`` with the following statement.
 
     .. container:: option
 
@@ -36,8 +36,8 @@ To use these properties, you'll need to import ``AWSSS3Model``.
                 #import <AWSS3/AWSS3.h>
 
 ``SSECustomerAlgorithm`` is a property of ``AWSS3ReplicateObjectOutput``. If server-side encryption
-with a customer-provided encryption key was requested, the response will include this header
-confirming the encryption algorithm used. Currently, the only valid option is AES256. You can
+with a customer-provided encryption key was requested, the response will include this header,
+which confirms the encryption algorithm that was used. Currently, the only valid option is AES256. You can
 access ``SSECustomerAlgorithm`` as follows.
 
     .. container:: option
@@ -55,8 +55,8 @@ access ``SSECustomerAlgorithm`` as follows.
                 replicateObjectOutput.SSECustomerAlgorithm = @"mySseCustomerAlgorithm";
 
 ``SSECustomerKey``, a property of ``AWSS3UploadPartRequest``, specifies the customer-provided
-encryption key for Amazon S3 to use in encrypting data. This value is used to store the object,
-and then it's discarded; Amazon doesn't store the encryption key. The key must be appropriate for
+encryption key for Amazon S3 to use to encrypting data. This value is used to store the object,
+and is then discarded; Amazon doesn't store the encryption key. The key must be appropriate for
 use with the algorithm specified in the ``x-amz-server-side-encryption-customer-algorithm`` header.
 This must be the same encryption key specified in the request to initiate a multipart upload. You
 can access SSECustomerKey as follows.
@@ -78,7 +78,7 @@ can access SSECustomerKey as follows.
 
 ``SSECustomerKeyMD5`` is a property of ``AWSS3PutObjectOutput``. If server-side encryption
 with a customer-provided encryption key is requested, the response will include this
-header to provide round trip message integrity verification of the customer-provided
+header. The response provides round trip message integrity verification of the customer-provided
 encryption key. You can access ``SSECustomerKeyMD5`` as follows.
 
     .. container:: option
@@ -95,7 +95,7 @@ encryption key. You can access ``SSECustomerKeyMD5`` as follows.
                 AWSS3PutObjectOutput *objectOutput = [AWSS3PutObjectOutput new];
                 //Access objectOutput.SSECustomerKeyMD5 ...
 
-``AWSS3ServerSideEncryption`` represents the encryption algorithm for storing an object in S3. You
+``AWSS3ServerSideEncryption`` represents the encryption algorithm for storing an object in Amazon S3. You
 can access it as follows.
 
     .. container:: option

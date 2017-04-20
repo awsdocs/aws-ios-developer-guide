@@ -11,19 +11,19 @@
 Amazon S3 Pre-Signed URLs: For Background Transfer
 ##################################################
 
-In certain cases |mdash| particularly if you're working with large file transfers |mdash| you
+If you are working with large file transfers, you
 may want to perform uploads and downloads in the background. To do this, you need to create a
 background session using ``NSURLSession`` and then transfer your objects using pre-signed URLs.
 
-The sections below discuss pre-signed S3 URLs. To learn more about ``NSURLSession``, see
+The following sections describe pre-signed S3 URLs. To learn more about ``NSURLSession``, see
 `Using NSURLSession <https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/URLLoadingSystem/Articles/UsingNSURLSession.html>`_.
 
 Pre-Signed URLs
 ---------------
-By default, all S3 resources are private. If you want your users to have access to S3 objects
-or to an S3 bucket, you can assign appropriate permissions via an `IAM policy <http://docs.aws.amazon.com/IAM/latest/UserGuide/PoliciesOverview.html>`_.
+By default, all Amazon S3 resources are private. If you want your users to have access to Amazon S3 buckets
+or objects, you can assign appropriate permissions with an `IAM policy <http://docs.aws.amazon.com/IAM/latest/UserGuide/PoliciesOverview.html>`_.
 
-Alternatively, you can use pre-signed URLs to give your users access to S3 objects. A pre-signed URL
+Alternatively, you can use pre-signed URLs to give your users access to Amazon S3 objects. A pre-signed URL
 provides access to an object without requiring AWS security credentials or permissions.
 
 When you create a pre-signed URL, you must provide your security credentials, specify a bucket name,
@@ -32,7 +32,7 @@ an object key, an HTTP method, and an expiration date and time. The pre-signed U
 Build a Pre-Signed URL
 ----------------------
 
-The following example shows how to build a pre-signed URL for an S3 download in the background.
+The following example shows how to build a pre-signed URL for an Amazon S3 download in the background.
 
     .. container:: option
 
@@ -84,7 +84,7 @@ The following example shows how to build a pre-signed URL for an S3 download in 
                     return nil;
                 }];
 
-The example above uses GET as the HTTP method: ``AWSHTTPMethodGET``. For an upload request to S3,
+The [receding example uses ``GET`` as the HTTP method: ``AWSHTTPMethodGET``. For an upload request to Amazon S3,
 we would need to use a PUT method and also specify a content type.
 
     .. container:: option

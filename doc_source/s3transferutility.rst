@@ -8,118 +8,96 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-Amazon S3 Transfer Utility for iOS
-#########################################
+Amazon S3 TransferUtility for iOS
+##################################
 
-`Amazon S3 Transfer Manager for iOS <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/s3transfermanager.html#create-the-s3-transfermanager-client>`_ simplifies data transfer between your
-iOS app and Amazon S3. In addition to the S3 Transfer Manager, there is an easier and more powerful
-way to transfer data between your iOS app and Amazon S3, Amazon S3 Transfer Utility for iOS. This topic
-shows you how to get started with the new Amazon S3 Transfer Utility.
+On this page:
 
-The Amazon S3 Transfer Utility offers two main advantages over the S3 Transfer Manager:
+.. contents::
+   :local:
+   :depth: 1
 
-- Ability to continue transferring data in the background
+:guilabel:`Amazon Simple Storage Service (S3)`
 
-- An API to upload binary data without first requiring it be saved as a file. The S3 Transfer Manager requires you to save data to a file before passing it to Transfer Manager.
+`Amazon Simple Storage Service (S3) <http://aws.amazon.com/s3/>`_ provides secure,
+durable, highly scalable object storage in the cloud. Using the AWS Mobile SDK for iOS, you can
+directly access Amazon S3 from your mobile app. For information about Amazon S3 regional availability,
+see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
 
-Setting Up the S3 Transfer Utility
-==================================
+:guilabel:`TransferUtility Features`
 
-To set up the S3 Transfer Utility in your app, you must set up Amazon Cognito Identity to
-authenticate calls to AWS from your app then configure your application delegate.
+In addition to downloading, uploading, pausing, resuming and cancelling transfers, use the Amazon S3 TransferUtility class to transfer data to a file without saving a source file. This class also completes transfers in the background, even if the system suspends your app. User choice to suspend an app cancels in-progress transfers.
 
-Setting Up Amazon Cognito Identity
----------------------------
+.. admonition:: Should I Use ``TransferManager`` or ``TransferUtility``?
 
-First, you need to set up Amazon Cognito Identity.
-
-Import the following header in your application delegate class.
-
-    .. container:: option
-
-        Swift
-            .. code-block:: swift
-
-                import AWSS3
+    To choose which API best suits your needs, see :ref:`manager-or-utility`
 
 
-        Objective-C
-            .. code-block:: objc
+Setup
+=====
 
-                #import <AWSS3/AWSS3.h>
+To set your project up to use ``TransferUtility``, take the steps below.
 
-Set up ``AWSCognitoCredentialsProvider`` in the ``- application:didFinishLaunchingWithOptions:`` application delegate.
+1. Setup the SDK, Credentials, and Services
+-------------------------------------------
 
-    .. container:: option
+    Follow the steps described in :doc:`s3-setup-for-ios` to install the AWS Mobile SDK for iOS and configure
+    AWS services, credentials, and permissions.
 
-        Swift
-            .. code-block:: swift
+2. Import the SDK Amazon S3 APIs
+--------------------------------
 
-                func application(_ application: UIApplication,
-                             didFinishLaunchingWithOptions launchOptions:
-                             [ UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-                    let credentialProvider = AWSCognitoCredentialsProvider(regionType: .USEast1, identityPoolId: "YourIdentityPoolId")
-                    let configuration = AWSServiceConfiguration(region:.USEast1, credentialsProvider:credentialProvider)
-                    AWSServiceManager.default().defaultServiceConfiguration = configuration
-                    return true
-                }
+    Add the following import statements to your Xcode project.
 
-        Objective-C
-            .. code-block:: objc
+        .. container:: option
 
-                - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-                AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc]
-                initWithRegionType:AWSRegionUSEast1 identityPoolId:@"YourIdentityPoolId"];
-                    AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1
-                        credentialsProvider:credentialsProvider];
-                    AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
+            Swift
+                .. code-block:: swift
 
-                    return YES;
-                }
+                    import AWSS3
 
-Refer to `Set Up the SDK for iOS <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/setup.html>`_
-and `Amazon Cognito Identity <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/cognito-auth.html>`_ sections
-of `iOS Developer Guide <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/>`_ for more details.
+            Objective-C
+                .. code-block:: objc
 
-Configuring the Application Delegate
-------------------------------------
+                    #import <AWSS3/AWSS3.h>
 
-The Transfer Utility for iOS uses the background transfer feature in iOS to continue data transfers even when your app isn't
-running.
+3. Configure the Application Delegate
+---------------------------------------
 
-Call the following class method in your ``- application:handleEventsForBackgroundURLSession:completionHandler:``
-application delegate so that iOS can tell the Transfer Utility when the transfer finishes while the app is not suspended.
+    The Transfer Utility for iOS uses the background transfer feature in iOS to continue data
+    transfers even when your app isn't running.
 
-    .. container:: option
+    Call the following method in ``- application:handleEventsForBackgroundURLSession:``
+    ``completionHandler:`` of your application delegate. When the app in the foreground, the delegate
+    enables iOS to notify ``TransferUtility`` that a transfer has completed.
 
-        Swift
-            .. code-block:: swift
+        .. container:: option
 
-                func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
-                    // Store the completion handler. 
-                    AWSS3TransferUtility.interceptApplication(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
-                }
+            Swift
+                .. code-block:: swift
+
+                    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+                        // Store the completion handler. 
+                        AWSS3TransferUtility.interceptApplication(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
+                    }
 
 
-        Objective-C
-            .. code-block:: objc
+            Objective-C
+                .. code-block:: objc
 
 
-                - (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier
-                completionHandler:(void (^)())completionHandler {
-                    /* Store the completion handler.*/
-                    [AWSS3TransferUtility interceptApplication:application handleEventsForBackgroundURLSession:identifier completionHandler:completionHandler];
-                }
-
-Transferring Data
-=================
-
-After you set up the S3 Transfer Utility, you can upload or download files and binary data between S3 and your app.
+                    - (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier
+                    completionHandler:(void (^)())completionHandler {
+                        /* Store the completion handler.*/
+                        [AWSS3TransferUtility interceptApplication:application handleEventsForBackgroundURLSession:identifier completionHandler:completionHandler];
+                    }
 
 Uploading a File
-----------------
+================
 
-To upload a file call ``- uploadFile:bucket:key:contentType:expression:completionHander:`` on ``AWSS3TransferUtility``.
+The following code for uploading a file by calling ``uploadFile:`` on ``AWSS3TransferUtility`` uses the
+pattern that is common to all the types of transfers ``TransferUtility`` supports. For code examples for other kinds of transfer, see :ref:`more-examples`.
+.
 
     .. container:: option
 
@@ -167,74 +145,15 @@ To upload a file call ``- uploadFile:bucket:key:contentType:expression:completio
                     return nil;
                 }];
 
-If you want to know when the upload completes, you can pass a completion handler block. You can also configure the upload
-behavior by passing ``AWSS3TransferUtilityUploadExpression``. For example, you can add a upload progress feedback block to
-the expression object. Here is a code snippet containing the completion handler and upload progress feedback:
+.. _progress-completion:
 
-    .. container:: option
+Tracking Progress and Completion
+================================
 
-        Swift
-            .. code-block:: swift
+Implement progress and completion actions for TransferManager transfers by passing `progressBlock` and `completionHandler` blocks to the call to ``TransferUtility`` that initiates the transfer.
 
-                let  transferUtility = AWSS3TransferUtility.default()
-                transferUtility.uploadFile(fileURL,
-                            bucket: S3BucketName,
-                            key: S3UploadKeyName,
-                            contentType: "image/png",
-                            expression: expression,
-                            completionHandler).continueWith { (task) -> AnyObject! in
-                    if let error = task.error {
-                        print("Error: \(error.localizedDescription)")
-                    }
-                    if let _ = task.result {
-                        // Do something with uploadTask.
-                    }
-
-                    return nil;
-                }
-
-
-        Objective-C
-            .. code-block:: objc
-
-                NSURL *fileURL = // The file to upload.
-
-                AWSS3TransferUtilityUploadExpression *expression = [AWSS3TransferUtilityUploadExpression new];
-                expression.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        // Do something e.g. Update a progress bar.
-                    });
-                };
-
-                AWSS3TransferUtilityUploadCompletionHandlerBlock completionHandler = ^(AWSS3TransferUtilityUploadTask *task, NSError *error) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        // Do something e.g. Alert a user for transfer completion.
-                        // On failed uploads, `error` contains the error object.
-                    });
-                };
-
-                AWSS3TransferUtility *transferUtility = [AWSS3TransferUtility defaultS3TransferUtility];
-                [[transferUtility uploadFile:fileURL
-                                bucket:@"YourBucketName"
-                                key:@"YourObjectKeyName"
-                                contentType:@"text/plain"
-                                expression:expression
-                        completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
-                    if (task.error) {
-                        NSLog(@"Error: %@", task.error);
-                    }
-                    if (task.result) {
-                        AWSS3TransferUtilityUploadTask *uploadTask = task.result;
-                        // Do something with uploadTask.
-                    }
-
-                    return nil;
-                }];
-
-Uploading Binary Data
----------------------
-
-To upload an instance of ``NSData`` call ``- uploadData:bucket:key:contentType:expression:completionHander:``
+The following example of initiating a data upload shows how progress and completion handling is typically
+done for all transfers.
 
     .. container:: option
 
@@ -242,11 +161,13 @@ To upload an instance of ``NSData`` call ``- uploadData:bucket:key:contentType:e
             .. code-block:: swift
 
                 let data = // The data to upload
+
                 let expression = AWSS3TransferUtilityUploadExpression()
                 expression.progressBlock = {(task, progress) in DispatchQueue.main.async(execute: {
                         // Do something e.g. Update a progress bar.
                     })
                 }
+
                 let completionHandler = { (task, error) -> Void in
                     DispatchQueue.main.async(execute: {
                         // Do something e.g. Alert a user for transfer completion.
@@ -265,7 +186,7 @@ To upload an instance of ``NSData`` call ``- uploadData:bucket:key:contentType:e
                     if let error = task.error {
                         print("Error: \(error.localizedDescription)")
                     }
- 
+
                     if let _ = task.result {
                         // Do something with uploadTask.
                     }
@@ -305,56 +226,45 @@ To upload an instance of ``NSData`` call ``- uploadData:bucket:key:contentType:e
                         NSLog(@"Error: %@", task.error);
                     }
                     if (task.result) {
-                        AWSS3TransferUtilityUploadTask *uploadTask = task.result;
+                       AWSS3TransferUtilityUploadTask *uploadTask = task.result;
                         // Do something with uploadTask.
                     }
 
                     return nil;
                 }];
 
-Note that this method saves the data as a file in a temporary directory. The next time ``AWSS3TransferUtility`` is
-initialized, the expired temporary files are cleaned up. If you upload many large objects to an Amazon S3 bucket in a short
-period of time, it's better to use the upload file method then manually purge the unnecessary temporary files as early as
-possible for more efficient use of disk space.
+.. _managing-transfers:
 
-Downloading to a File
----------------------
+Managing Transfers
+==================
 
-Here are code snippets you can use for downloading to a file.
+This section describes how to manage ``TransferUtility`` transfers at different points in the app lifecycle.
+
+With the App in the Foreground
+------------------------------
+
+To suspend, resume, and cancel uploads and downloads, retain references to
+``AWSS3TransferUtilityUploadTask`` and ``AWSS3TransferUtilityDownloadTask``.
+To manage data transfers call ``suspend``, ``resume``, and ``cancel`` on those tasks.
+The following example shows the ``cancel`` method being called on an upload.
 
     .. container:: option
 
         Swift
             .. code-block:: swift
 
-                let fileURL = // The file URL of the download destination.
-                let expression = AWSS3TransferUtilityDownloadExpression ()
-                expression.progressBlock = {(task, progress) in
-                    DispatchQueue.main.async(execute: {
-                        // Do something e.g. Update a progress bar.
-                    }
-                }
-                let completionHandler = { (task, location, data, error) -> Void in
-                    DispatchQueue.main.async(execute: {
-                        // Do something e.g. Alert a user for transfer completion.
-                        // On successful downloads, `location` contains the S3 object file URL.
-                        // On failed downloads, `error` contains the error object.
-                    })
-                }
-                let  transferUtility = AWSS3TransferUtility.default()
-                transferUtility.download(
-                        to: fileURL
+                transferUtility.uploadFile(fileURL,
                         bucket: S3BucketName,
-                        key: S3DownloadKeyName,
-                        expression: expression,
-                        completionHander: completionHandler
-                ).continueWith {
+                        key: S3UploadKeyName,
+                        contentType: "image/png",
+                        expression: nil,
+                        completionHandler: nil).continueWith {
                     (task) -> AnyObject! in if let error = task.error {
                         print("Error: \(error.localizedDescription)")
                     }
 
-                    if let _ = task.result {
-                        // Do something with downloadTask.
+                    if let uploadTask = task.result {
+                        uploadTask.cancel()
                     }
                     return nil;
                 }
@@ -362,131 +272,35 @@ Here are code snippets you can use for downloading to a file.
         Objective-C
             .. code-block:: objc
 
-                NSURL *fileURL = ...; // The file URL of the download destination.
-
-                AWSS3TransferUtilityDownloadExpression *expression = [AWSS3TransferUtilityDownloadExpression new];
-                expression.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        // Do something e.g. Update a progress bar.
-                    });
-                };
-
-                AWSS3TransferUtilityDownloadCompletionHandlerBlock completionHandler = ^(AWSS3TransferUtilityDownloadTask *task, NSURL *location, NSData *data, NSError *error) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        // Do something e.g. Alert a user for transfer completion.
-                        // On successful downloads, `location` contains the S3 object file URL.
-                        // On failed downloads, `error` contains the error object.
-                    });
-                };
-
-                AWSS3TransferUtility *transferUtility = [AWSS3TransferUtility defaultS3TransferUtility];
-                [[transferUtility downloadToURL:nil
-                                bucket:S3BucketName
-                                key:S3DownloadKeyName
-                                expression:expression
-                        completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                [[transferUtility uploadFile:fileURL
+                                    bucket:@"YourBucketName"
+                                    key:@"YourObjectKeyName"
+                                    contentType:@"text/plain"
+                                    expression:nil
+                            completionHander:nil] continueWithBlock:^id(AWSTask *task) {
                     if (task.error) {
                         NSLog(@"Error: %@", task.error);
                     }
                     if (task.result) {
-                        AWSS3TransferUtilityDownloadTask *downloadTask = task.result;
-                        // Do something with downloadTask.
+                        AWSS3TransferUtilityUploadTask *uploadTask = task.result;
+                        [uploadTask cancel]
                     }
 
                     return nil;
                 }];
 
-Downloading as Binary Data
---------------------------
+When a Suspended App Returns to the Foreground
+----------------------------------------------
 
-Here are code snippets you can use for downloading binary data.
+Upon App Returning to the Foreground
 
-    .. container:: option
+When an app that has initiated a ``TransferUtility`` transfer becomes suspended and then returns to the foreground, the transfer may still be in progress or may have completed. In both cases, use the following code to reestablish the transfer as being handled by progress and completion blocks of the app in the foreground.
 
-        Swift
-            .. code-block:: swift
+The code uses downloading a file as the example but the pattern also works for upload:
 
-                let fileURL = // The file URL of the download destination.
-                let expression = AWSS3TransferUtilityDownloadExpression ()
-                expression.progressBlock = {
-                    (task, progress) in DispatchQueue.main.async( execute: {
-                        // Do something e.g. Update a progress bar.
-                    })
-                }
-                let completionHandler = {
-                    (task, location, data, error) -> Void in DispatchQueue.main.async( execute: {
-                        // Do something e.g. Alert a user for transfer completion.
-                        // On successful downloads, `location` contains the S3 object file URL.
-                        // On failed downloads, `error` contains the error object.
-                    })
-                }
-                let  transferUtility = AWSS3TransferUtility.default()
-                transferUtility.downloadData(
-                        fromBucket: S3BucketName,
-                        key: S3DownloadKeyName,
-                        expression: expression,
-                        completionHander: completionHandler
-                ).continueWith {
-                    (task) -> AnyObject! in if let error = task.error {
-                        print("Error: \(error.localizedDescription)")
-                    }
+You receive ``AWSS3TransferUtilityUploadTask`` and ``AWSS3TransferUtilityDownloadTask`` when you initiate the upload and download respectively. These tasks have a property called ``taskIdentifier``, which uniquely identifies the transfer task object within the Transfer Utility. Your app should persist the identifier through closure and relaunch, so that you can uniquely identify the task objects when the app is comes back into the foreground.
 
-                    if let _ = task.result {
-                        // Do something with downloadTask.
-                    }
-
-                    return nil;
-                }
-
-        Objective-C
-            .. code-block:: objc
-
-                AWSS3TransferUtilityDownloadExpression *expression = [AWSS3TransferUtilityDownloadExpression new];
-                expression.progressBlock = ^(AWSS3TransferUtilityTask *task, NSProgress *progress) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        // Do something e.g. Update a progress bar.
-                    });
-                };
-
-                AWSS3TransferUtilityDownloadCompletionHandlerBlock completionHandler = ^(
-                    AWSS3TransferUtilityDownloadTask *task, NSURL *location, NSData *data, NSError *error) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            // Do something e.g. Alert a user for transfer completion.
-                            // On successful downloads, `data` contains the S3 object.
-                            // On failed downloads, `error` contains the error object.
-                        }
-                    );
-                };
-
-                AWSS3TransferUtility *transferUtility = [AWSS3TransferUtility defaultS3TransferUtility];
-                [[transferUtility downloadDataFromBucket:S3BucketName
-                    key:S3DownloadKeyName
-                    expression:expression
-                    completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
-                        if (task.error) {
-                            NSLog(@"Error: %@", task.error);
-                        }
-                        if (task.result) {
-                            AWSS3TransferUtilityDownloadTask *downloadTask = task.result;
-                            // Do something with downloadTask.
-                        }
-
-                        return nil;
-                    }
-                ];
-
-Transferring in the Background
-------------------------------
-
-All uploads and downloads continue in the background whether your app is active or in the background. If iOS
-terminates your app while transfers are ongoing, the system continues the transfers in the background then launches your app
-after the transfers finish. If the user terminates the app while transfers are ongoing, those transfers stop.
-
-You can't persist blocks on disk so you need to rewire the completion handler and progress feedback blocks when your app
-relaunches. You should call ``- enumerateToAssignBlocksForUploadTask:downloadTask:`` on ``AWSS3TransferUtility`` to reassign
-the blocks as needed. Here is an example of reassigning blocks.
-
-    .. container:: option
+   .. container:: option
 
         Swift
             .. code-block:: swift
@@ -521,22 +335,34 @@ the blocks as needed. Here is an example of reassigning blocks.
 
                 transferUtility.enumerateToAssignBlocks(forUploadTask: {
                     (task, progress, completion) -> Void in
+
                         let progressPointer = AutoreleasingUnsafeMutablePointer<AWSS3TransferUtilityProgressBlock?>(& uploadProgressBlock)
-                    let completionPointer = AutoreleasingUnsafeMutablePointer<AWSS3TransferUtilityUploadCompletionHandlerBlock?>(&completionBlockUpload)
-                    // Reassign your progress feedback
+
+                        let completionPointer = AutoreleasingUnsafeMutablePointer<AWSS3TransferUtilityUploadCompletionHandlerBlock?>(&completionBlockUpload)
+
+                        // Reassign your progress feedback
                         progress?.pointee = progressPointer.pointee
-                    // Reassign your completion handler.
+
+                        // Reassign your completion handler.
                         completion?.pointee = completionPointer.pointee
-                }, downloadTask: { (task, progress, completion) -> Void in
-                    let progressPointer = AutoreleasingUnsafeMutablePointer<AWSS3TransferUtilityProgressBlock?>(&downloadProgressBlock)
-                    let completionPointer = AutoreleasingUnsafeMutablePointer<AWSS3TransferUtilityDownloadCompletionHandlerBlock?>(&completionBlockDownload)
 
-                    // Reassign your progress feedback
-                    progress?.pointee = progressPointer.pointee
+                }, downloadTask: {
+                    (task, progress, completion) -> Void in
 
-                    // Reassign your completion handler.
-                    completion?.pointee = completionPointer.pointee
+                        let progressPointer = AutoreleasingUnsafeMutablePointer<AWSS3TransferUtilityProgressBlock?>(&downloadProgressBlock)
+
+                        let completionPointer = AutoreleasingUnsafeMutablePointer<AWSS3TransferUtilityDownloadCompletionHandlerBlock?>(&completionBlockDownload)
+
+                        // Reassign your progress feedback
+                        progress?.pointee = progressPointer.pointee
+
+                        // Reassign your completion handler.
+                        completion?.pointee = completionPointer.pointee
                 })
+
+                 if let downloadTask = task.result {
+                    // Do something with downloadTask.
+                }
 
         Objective-C
             .. code-block:: objc
@@ -568,69 +394,209 @@ the blocks as needed. Here is an example of reassigning blocks.
                     }];
                 }
 
-You receive ``AWSS3TransferUtilityUploadTask`` and ``AWSS3TransferUtilityDownloadTask`` when you initiate the upload and
-download respectively.
+                if (task.result) {
+                    AWSS3TransferUtilityUploadTask *downloadTask = task.result;
+                    // Do something with downloadTask.
+                }
 
-- For upload
+.. _more-examples:
+
+More Transfer Examples
+======================
+
+This section provides descriptions and abbreviated examples of the aspects of each type of
+transfer that are unique. For information about typical code surrounding the following snippets
+see :ref:`managing-transfers` and :ref:`progress-completion`.
+
+Downloading to a File
+---------------------
+
+The following code shows how to download a file.
 
     .. container:: option
 
         Swift
             .. code-block:: swift
 
-                if let uploadTask = task.result {
-                    // Do something with uploadTask.
-                }
+                let fileURL = // The file URL of the download destination.
 
+                // Add progress and completion blocks
+                . . .
+
+                let  transferUtility = AWSS3TransferUtility.default()
+                transferUtility.download(
+                        to: fileURL
+                        bucket: S3BucketName,
+                        key: S3DownloadKeyName,
+                        expression: expression,
+                        completionHander: completionHandler
+                ).continueWith {
+                    (task) -> AnyObject! in if let error = task.error {
+                        print("Error: \(error.localizedDescription)")
+                    }
+
+                    if let _ = task.result {
+                        // Do something with downloadTask.
+                    }
+                    return nil;
+                }
 
         Objective-C
             .. code-block:: objc
 
-                if (task.result) {
-                    AWSS3TransferUtilityUploadTask *uploadTask = task.result;
-                    // Do something with uploadTask.
-                }
+                NSURL *fileURL = ...; // The file URL of the download destination.
 
-- For download
+                // Add progress and completion blocks
+                . . .
+
+                AWSS3TransferUtility *transferUtility = [AWSS3TransferUtility defaultS3TransferUtility];
+                [[transferUtility downloadToURL:nil
+                                bucket:S3BucketName
+                                key:S3DownloadKeyName
+                                expression:expression
+                        completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                        NSLog(@"Error: %@", task.error);
+                    }
+                    if (task.result) {
+                        AWSS3TransferUtilityDownloadTask *downloadTask = task.result;
+                        // Do something with downloadTask.
+                    }
+
+                    return nil;
+                }];
+
+Uploading Binary Data to a File
+-------------------------------
+
+To upload data to a file in Amazon S3 call ``uploadData:``.
+
+This method saves the data as a file in a temporary directory. The next time ``AWSS3TransferUtility`` is
+initialized, the expired temporary files are cleaned up. If you upload many large objects to an Amazon S3 bucket in a short period of time, it is more efficient to use the upload file method and then manually purge the unnecessary temporary files as early as possible.
 
     .. container:: option
 
         Swift
             .. code-block:: swift
 
-                if let downloadTask = task.result {
-                    // Do something with downloadTask.
-                }
+                let data = // The data to upload
 
+                // Add progress and completion blocks
+                . . .
+
+                let  transferUtility = AWSS3TransferUtility.default()
+
+                transferUtility.uploadData(data,
+                            bucket: S3BucketName,
+                            key: S3UploadKeyName,
+                            contentType: "image/png",
+                            xpression: expression,
+                            completionHandler: completionHandler).continueWith { (task) -> AnyObject! in
+                    if let error = task.error {
+                        print("Error: \(error.localizedDescription)")
+                    }
+ 
+                    if let _ = task.result {
+                        // Do something with uploadTask.
+                    }
+
+                    return nil;
+                }
 
 
         Objective-C
             .. code-block:: objc
 
-                if (task.result) {
-                    AWSS3TransferUtilityDownloadTask *downloadTask = task.result;
-                    // Do something with downloadTask.
+                NSData *dataToUpload = // The data to upload.
+
+                // Add progress and completion blocks
+                . . .
+
+                AWSS3TransferUtility *transferUtility = [AWSS3TransferUtility defaultS3TransferUtility];
+                [[transferUtility uploadData:dataToUpload
+                                bucket:@"YourBucketName"
+                                key:@"YourObjectKeyName"
+                                contentType:@"text/plain"
+                                expression:expression
+                        completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                    if (task.error) {
+                        NSLog(@"Error: %@", task.error);
+                    }
+                    if (task.result) {
+                        AWSS3TransferUtilityUploadTask *uploadTask = task.result;
+                        // Do something with uploadTask.
+                    }
+
+                    return nil;
+                }];
+
+
+Downloading Binary Data to a File
+---------------------------------
+
+The following code shows how to download binary a file.
+
+    .. container:: option
+
+        Swift
+            .. code-block:: swift
+
+                let fileURL = // The file URL of the download destination.
+
+                // Add progress and completion blocks
+                . . .
+
+                let  transferUtility = AWSS3TransferUtility.default()
+                transferUtility.downloadData(
+                        fromBucket: S3BucketName,
+                        key: S3DownloadKeyName,
+                        expression: expression,
+                        completionHander: completionHandler
+                ).continueWith {
+                    (task) -> AnyObject! in if let error = task.error {
+                        print("Error: \(error.localizedDescription)")
+                    }
+
+                    if let _ = task.result {
+                        // Do something with downloadTask.
+                    }
+
+                    return nil;
                 }
 
-They have a property called ``taskIdentifier``, which uniquely identifies the transfer task object within the Transfer Utility.
-You may need to persist the identifier so that you can uniquely identify the upload/download task objects when rewiring the
-blocks for app relaunch.
+        Objective-C
+            .. code-block:: objc
 
-Managing Data Transfers
-=======================
+                AWSS3TransferUtilityDownloadExpression *expression = [AWSS3TransferUtilityDownloadExpression new];
 
-In order to suspend, resume, and cancel uploads and downloads, you need to retain references to ``AWSS3TransferUtilityUploadTask`` and ``AWSS3TransferUtilityDownloadTask``.
+                // Add progress and completion blocks
+                . . .
 
-To manage data transfers call ``- suspend``, ``- resume``, and ``- cancel`` on ``AWSS3TransferUtilityUploadTask``
-and ``AWSS3TransferUtilityDownloadTask``.
+                AWSS3TransferUtility *transferUtility = [AWSS3TransferUtility defaultS3TransferUtility];
+                [[transferUtility downloadDataFromBucket:S3BucketName
+                    key:S3DownloadKeyName
+                    expression:expression
+                    completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                        if (task.error) {
+                            NSLog(@"Error: %@", task.error);
+                        }
+                        if (task.result) {
+                            AWSS3TransferUtilityDownloadTask *downloadTask = task.result;
+                            // Do something with downloadTask.
+                        }
+
+                        return nil;
+                    }
+                ];
+
 
 Limitations
 ===========
 
-The S3 Transfer Utility generates Amazon S3 Pre-Signed URLs to use for background data transfer.
-Using Amazon Cognito Identity, you receive AWS temporary credentials that are valid up to 60 minutes.
+The S3 Transfer Utility generates Amazon S3 pre-signed URLs to use for background data transfer.
+Using Amazon Cognito Identity, you receive AWS temporary credentials. The credentials are valid for up to 60 minutes.
 At the same time, generated S3 pre-signed URLs cannot last longer than that time. Because of this
-limitation, the S3 Transfer Utility enforces 50 minute transfer timeouts, leaving a 10 minute
+limitation, the Amazon S3 Transfer Utility enforces 50 minute transfer timeouts, leaving a 10 minute
 buffer before AWS temporary credentials are regenerated. After 50 minutes, you receive a transfer failure.
 
-If you need to transfer data that cannot be transferred in under 50 minutes, use ``AWSS3`` instead.
+If you need to transfer data that cannot be transferred in under 50 minutes, use `AWSS3` instead.

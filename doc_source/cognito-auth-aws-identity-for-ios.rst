@@ -8,52 +8,65 @@
    either express or implied. See the License for the specific language governing permissions and
    limitations under the License.
 
-Amazon Cognito: Authenticated and Unauthenticated AWS User Identities
-#####################################################################
+Amazon Cognito for iOS
+######################
 
-Using Amazon Cognito, you can create unique identities for your users and authenticate
-them for secure access to your AWS resources. Amazon Cognito supports public identity providers |mdash|
-Amazon, Facebook, and Google |mdash| as well as unauthenticated identities. You can establish your own identity provider through Amazon Cognito Your User Pools. Amazon Cognito also supports
-SAML 2.0 federation with enterprise identity providers like Active Directory, and developer authenticated identities, which let you register and authenticate users via your own backend authentication process, while still using Amazon Cognito to synchronize user data and access AWS resources.
+For your app to access AWS services and resources, it must facilitate getting an identity within AWS
+for each user. Use Amazon Cognito to create unique identities for your users. Amazon Cognito
+identities can be unauthenticated, or they can use a range of methods to sign in and become authenticated.
+For more information, see :ref:`integrating-identity-providers`.
 
-For information about Amazon Cognito Identity Region availability, see  `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
-
-To use AWS services in your app, you must include :file:`AWSxxx.framework` (where 'xxx' is the AWS service you wish to use) in your project.
-
-Prerequisites
-=============
-
-To integrate Amazon Cognito with your app, you need the following:
-
-* An `AWS account <https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct>`_
-* An `Xcode development environment <https://developer.apple.com/xcode/>`_
-* `AWS Mobile SDK for iOS <http://aws.amazon.com/mobile/sdk/>`_
-* Optionally, a developer account and an application registered with the identity provider
-  you want to use (`Facebook <https://developers.facebook.com/>`_, `Google <https://developers.google.com/>`_,  or `Amazon <http://login.amazon.com/>`_)
-
-Create an Identity Pool
-=======================
-
-To use Amazon Cognito in your app, you'll need to create an identity pool. An identity
-pool is a store of user identity data specific to your account. Using :doc:`cognito-sync-data-across-devices-for-ios`,
-you can retrieve the data across client platforms, devices, and operating systems, so that
-if a user starts using your app on a phone and later switches to a tablet, the persisted
-app information is still available for that user. To create a new identity pool, log in to the `Amazon Cognito console <https://console.aws.amazon.com/cognito/>`_. The :guilabel:`New Identity Pool` wizard will guide you through the configuration process.
+For information about Amazon Cognito Region availability, see `AWS Service Region Availability <http://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/>`_.
 
 
 Providing AWS Credentials
 =========================
 
-You can use Amazon Cognito to deliver temporary, limited-privilege credentials to your
-application, so that your users can access AWS resources. Amazon Cognito supports both authenticated and unauthenticated users.
+Most implementations of AWS services for mobile app features require identity management through Amazon Cognito. The following steps describe how to  AWS credentials to your app users.
 
-To provide AWS credentials to your app, follow the steps below.
+In this section:
 
-#. In the `Amazon Cognito console <https://console.aws.amazon.com/cognito/>`_,
-   create an identity pool and download or copy the starter code snippets.
-#. If you haven't already done so, add the :file:`AWSCore.framework` to your project.
-   (For more information, see :doc:`setup-aws-sdk-for-ios`).
-#. In your source code, include the :file:`AWSCore` header
+.. contents::
+   :local:
+   :depth: 1
+
+1. Create an identity pool and roles
+------------------------------------
+
+   Take the following steps to create a new identity pool with `Auth` and `Unauth` roles.
+
+   #. Sign in to the `Amazon Cognito console <https://console.aws.amazon.com/cognito/>`_.
+
+   #. Choose :guilabel:`Manage Federated Identities`.
+
+   #. Choose :guilabel:`Create new identity pool`.
+
+   #. Type an :guilabel:`Identity pool name`.
+
+   #. Optional: Select :guilabel:`Enable access to unauthenticated identities`.
+
+   #. Choose :guilabel:`Create Pool`.
+
+   #. Choose :guilabel:`View Details` to review or edit the role names and default access policy JSON document
+      for the identity pool you just created. Note the names of your `Auth` and
+      `Unauth` roles. You will use them to enact access policy for the AWS resources you use.
+
+   #. Choose: :guilabel:`Allow`.
+
+   #. Choose the language of your app code in the :guilabel:`Platform` menu. Note the `identityPoolId`
+      value in the sample code provided.
+
+   For more information, see :ref:`create-identity-pool`.
+
+2. Add the AWS SDK for iOS to your project
+------------------------------------------
+
+Follow the steps in :doc:`setup-aws-sdk-for-ios`.
+
+3. Import `AWScore` and Amazon Cognito APIs
+--------------------------------------------
+
+Add the following imports to your project.
 
     .. container:: option
 
@@ -61,14 +74,19 @@ To provide AWS credentials to your app, follow the steps below.
             .. code-block:: swift
 
                 import AWSCore
+                import AWSCognito
 
         Objective-C
             .. code-block:: objc
 
                 #import <AWSCore/AWSCore.h>
+                #import <AWSCognito/AWSCognito.h>
 
-#. Initialize the Amazon Cognito credentials provider using the code snippet generated by the
-   Amazon Cognito Console. The value for ``YourIdentityPoolId`` will be specific to your account
+4. Initialize the Amazon Cognito credentials provider
+-----------------------------------------------------
+
+Use the following code, replacing the value of `YourIdentityPoolId` with the
+`identitPoolId` value you noted when you created your identity pool.
 
     .. container:: option
 
@@ -83,21 +101,23 @@ To provide AWS credentials to your app, follow the steps below.
             .. code-block:: objc
 
                 AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionUSEast1
-                identityPoolId:@"<your-identity-pool-arn>"];
+                identityPoolId:@"YourIdentityPoolId"];
 
                 AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1 credentialsProvider:credentialsProvider];
 
                 AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
 
-.. Note::
-	If you created your identity pool before February 2015, you will need to reassociate your roles with your identity pool in order to use this constructor. To do so, open the `Cognito Console <https://console.aws.amazon.com/cognito>`_, select your identity pool, click :guilabel:`Edit Identity Pool`, specify your authenticated and unauthenticated roles, and save the changes.
+    .. note::
 
-Retrieving an Amazon Cognito ID and AWS Credentials
-===================================================
+      If you created your identity pool before February 2015, you must reassociate your roles with your identity pool to use this constructor. To do so, open the `Amazon Cognito console <https://console.aws.amazon.com/cognito/>`_, select your identity pool, choose :guilabel:`Edit Identity Pool`, specify your authenticated and unauthenticated roles, and save the changes
 
-Once the login tokens are set in the credentials provider, you can retrieve a unique
-Amazon Cognito identifier for your end user and temporary credentials that let the app access
-your AWS resources.
+
+5. Retrieve Amazon Cognito IDs and AWS Credentials
+--------------------------------------------------
+
+   After   the login tokens are set in the credentials provider, you can retrieve a unique
+   Amazon Cognito identifier for your end user and temporary credentials that let the app access
+   your AWS resources.
 
     .. container:: option
 
@@ -112,29 +132,56 @@ your AWS resources.
                 // Retrieve your Amazon Cognito ID.
                 NSString *cognitoId = credentialsProvider.identityId;
 
-The unique identifier is available in the ``identityId`` property of the credentials provider object.
+   The unique identifier is available in the ``identityId`` property of the credentials provider object.
 
-Once the Amazon Cognito credentials provider is initialized, you can use it to create clients for
-other Amazon Web Services. The example below shows how to create an Amazon DynamoDB client.
+   The `credentialsProvider` communicates with Amazon Cognito, retrieving a unique identifier for the user as well as temporary, limited privilege AWS credentials for the AWS Mobile SDK. The retrieved credentials are valid for one hour.
 
-    .. container:: option
 
-        Swift
-            .. code-block:: swift
+.. _create-identity-pool:
 
-                let dynamoDB = AWSDynamoDB.default()
+Identity Pools and IAM Roles
+============================
 
-        Objective-C
-            .. code-block:: objc
+To use Amazon Cognito to incorporate sign-in through an external identity provider into your
+app, create an `Amazon Cognito identity pool <http://docs.aws.amazon.com/cognito/latest/developerguide/identity-pools.html>`_.
 
-                AWSDynamoDB *dynamoDB = [AWSDynamoDB defaultDynamoDB];
+An identity in a pool gets access to the AWS resources used by your app by being assigned a
+role in AWS Identity and Access Management (IAM). The access level of an IAM role is
+defined by the policy that is attached to it. Typical roles for identity pools allow you to
+give different levels of access to authenticated (`Auth`)or signed in users, and unauthenticated (`Unauth`)users.
 
-The credentials provider communicates with Amazon Cognito, retrieving a unique identifier for the user as well as temporary, limited privilege AWS credentials for the AWS Mobile SDK. The retrieved credentials are valid for one hour.
+For more information on identity pools, see `Amazon Cognito Identity: Using Federated Identities <https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html>`_.
+
+For more information on using IAM roles with Amazon Cognito, see `IAM Roles <https://docs.aws.amazon.com/cognito/latest/developerguide/iam-roles.html>`_ in the *Amazon Cognito Developer Guide*.
+
+
+.. _integrating-identity-providers:
 
 Integrating Identity Providers
 ==============================
 
-With Amazon Cognito, you can create unique end user identifiers for accessing AWS cloud services by using public login providers such as Amazon, Facebook, Google, Twitter and any OpenID Connect compatible provider, or by using your own user identity system. With these identifiers you can store app data in the Amazon Cognito sync store or access other AWS services like Amazon S3 or Amazon DynamoDB. For information on how to use "External Identity Providers" with Amazon Cognito, please see the `Amazon Cognito Developer Guide <http://docs.aws.amazon.com/cognito/devguide/identity/external-providers/>`_.
+Amazon Cognito identities can be unauthenticated or use a range of methods to sign in and become authenticated, including:
+
+    * Federating with an `external provider <http://docs.aws.amazon.com/cognito/latest/developerguide/external-identity-providers.html>`_ such as Google or Facebook
+
+
+        * For external providers, a developer account and an application registered with the identity provider
+          you want to use (`Facebook <https://developers.facebook.com/>`_,
+          `Google <https://developers.google.com/>`_,  or `Amazon <http://login.amazon.com/>`_)
+
+
+    * Federating with a `SAML Provider <http://docs.aws.amazon.com/cognito/latest/developerguide/saml-identity-provider.html>`_ such as a Microsoft Active Directory instance
+
+        * For SAML federation, the SAML federation metadata for the authenticating system
+
+    * Federating with your existing custom authentication provider using `developer authenticated identities <http://docs.aws.amazon.com/cognito/latest/developerguide/developer-authenticated-identities.html>`_
+
+    * Creating your own AWS-managed identity provider using `Amazon Cognito User Pool <http://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html>`_
+
+Then, each time your mobile app interacts with Amazon Cognito, your user's identity is given a set of temporary
+credentials that give secure access to the AWS resources configured for your app.
+
+For information see, `External Identity Providers<http://docs.aws.amazon.com/cognito/devguide/identity/external-providers/>`_ in the *Amazon Cognito Developer Guide*.
 
 Related Documentation
 ---------------------

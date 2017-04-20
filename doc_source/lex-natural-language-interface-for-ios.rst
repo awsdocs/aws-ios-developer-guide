@@ -86,30 +86,6 @@ To add permission to use the microphone to enable users to speak to Amazon Lex t
              . . .
         </plist>
 
-Get AWS User Credentials for Text and Voice
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Both text and voice API calls require validated AWS credentials. To establish Amazon Cognito as the credentials provider, include the following code in your App Delegate.
-
-    .. container:: option
-
-        Swift
-            .. code-block:: swift
-
-                let credentialsProvider = AWSCognitoCredentialsProvider(regionType: “Your Amazon Cognito Identity Pool Region”, identityPoolId: “Your Amazon Cognito Identity Pool Id”)
-                let configuration = AWSServiceConfiguration(region: .USEast1, credentialsProvider: credentialsProvider)
-                AWSServiceManager.default().defaultServiceConfiguration = configuration
-
-        Objective C
-	        .. code-block:: objectivec
-
-	            -(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	                AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:AWSRegionUSEast1 identityPoolId:@"YourIdentityPoolId"];
-	                AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:AWSRegionUSEast1 credentialsProvider:credentialsProvider];
-	                [AWSServiceManager defaultServiceManager].defaultServiceConfiguration = configuration;
-
-	                return YES;
-	            }
 
 Integrating the Interaction Client
 ----------------------------------
