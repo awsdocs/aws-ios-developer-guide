@@ -14,7 +14,7 @@ Preparing Your App to Work with ATS
 ####################################
 
 If you use the iOS 9 SDK (or Xcode 7) or later, the Apple `App Transport Security (ATS) <https://developer.apple.com/library/prerelease/ios/technotes/App-Transport-Security-Technote/>`_
-feature might impact how your apps interact with some AWS services. If you plan
+feature might impact how your apps interact with some AWS services.
 
 If your app targeted for iOS 9+ attempts to connect to an AWS service endpoint that does not yet meet all the ATS requirements, the connection may fail. The following sections provide instructions to determine if your app is affected, and what steps to take to mitigate the impact of ATS on your app.
 
@@ -81,7 +81,7 @@ If your app stops working after being upgraded to Xcode 7 or later and iOS 9 or 
 Mitigating ATS Connection Issues
 ================================
 
-If you determine that your app is impacted by the diagnostic handshake error, you can configure the app to interact properly with the ATS feature by taking the following steps to add properties to your ``Info.plist`` file..
+If you determine that your app is impacted by the diagnostic handshake error, you can configure the app to interact properly with the ATS feature by taking the following steps to add properties to your ``Info.plist`` file.
 
 1. Locate your ``Info.plist`` and from the context menu select **Open As** > **Source Code**.
 

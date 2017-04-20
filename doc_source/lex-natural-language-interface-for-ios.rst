@@ -54,7 +54,7 @@ To learn more about IAM policies, see `Using IAM <http://docs.aws.amazon.com/IAM
 Configure a Bot
 ---------------
 
-To setup interaction between your mobile app and |LEX|, use the |LEX| console to configure a bot that fulfills
+To set up interaction between your mobile app and |LEX|, use the |LEX| console to configure a bot that fulfills
 your requirements. To learn more see |LEX-dg|_.
 For a quickstart, see Step 2 of `Getting Started <http://docs.aws.amazon.com/lex/latest/dg/gs-bp-prep.html>`_ in the
 |LEX-dg|.
@@ -127,7 +127,7 @@ Implement `InteractionKit` delegate methods
 
 Declare and implement the following methods in the class where you intend to use your `InteractionKit`:
 
-- :code:`interactionKit` is called to begin a conversation. When passed :code:`interactionKit`, :code:`switchModeInput`, and :code:`completionSource` the function should set the mode of an interaction (audio or text input and output)  and pass the :code:`SwitchModeResponse` to the :code:`completionSource`. On error the `interactionKit:onError` method is called.
+- :code:`interactionKit` is called to begin a conversation. When passed :code:`interactionKit`, :code:`switchModeInput`, and :code:`completionSource`, the function should set the mode of interaction (audio or text input and output)  and pass the :code:`SwitchModeResponse` to the :code:`completionSource`. On error, the `interactionKit:onError` method is called.
 
     .. container:: option
 

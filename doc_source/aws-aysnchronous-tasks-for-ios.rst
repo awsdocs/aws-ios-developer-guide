@@ -29,7 +29,7 @@ Using completionHandler
 =======================
 
 Most simple asynchronous API method calls can use ``completionHandler`` to handle
-method callbacks. When an asynchrous method is complete, ``completionHandler`` returns two parts: a response
+method callbacks. When an asynchronous method is complete, ``completionHandler`` returns two parts: a response
 object containing the method's return if the call was successful, or ``nil`` if failed; and an error object containing the ``NSError`` state when a call fails, or ``nil`` upon success.
 
 Handling Asynchronous Method Returns with completionHandler

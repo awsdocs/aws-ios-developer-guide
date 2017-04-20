@@ -181,7 +181,7 @@ done for all transfers.
                             bucket: S3BucketName,
                             key: S3UploadKeyName,
                             contentType: "image/png",
-                            xpression: expression,
+                            expression: expression,
                             completionHandler: completionHandler).continueWith { (task) -> AnyObject! in
                     if let error = task.error {
                         print("Error: \(error.localizedDescription)")
@@ -490,7 +490,7 @@ initialized, the expired temporary files are cleaned up. If you upload many larg
                             bucket: S3BucketName,
                             key: S3UploadKeyName,
                             contentType: "image/png",
-                            xpression: expression,
+                            expression: expression,
                             completionHandler: completionHandler).continueWith { (task) -> AnyObject! in
                     if let error = task.error {
                         print("Error: \(error.localizedDescription)")
