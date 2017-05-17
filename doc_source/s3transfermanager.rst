@@ -168,7 +168,7 @@ The steps to call ``TransferManager`` for a transfer are as follows.
             Objective-C
                 .. code-block:: objc
 
-                    NSURL *uploadingFileURL = [NSURL fileURLWithPath: "your/file/path/myTestFile.txt"];
+                    NSURL *uploadingFileURL = [NSURL fileURLWithPath: @"your/file/path/myTestFile.txt"];
 
                     AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
 
