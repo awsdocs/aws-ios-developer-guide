@@ -84,7 +84,7 @@ The following example shows how to build a pre-signed URL for an Amazon S3 downl
                     return nil;
                 }];
 
-The [receding example uses ``GET`` as the HTTP method: ``AWSHTTPMethodGET``. For an upload request to Amazon S3,
+The preceding example uses ``GET`` as the HTTP method: ``AWSHTTPMethodGET``. For an upload request to Amazon S3,
 we would need to use a PUT method and also specify a content type.
 
     .. container:: option
