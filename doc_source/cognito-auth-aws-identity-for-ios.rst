@@ -181,7 +181,7 @@ Amazon Cognito identities can be unauthenticated or use a range of methods to si
 Then, each time your mobile app interacts with Amazon Cognito, your user's identity is given a set of temporary
 credentials that give secure access to the AWS resources configured for your app.
 
-For information see, `External Identity Providers<http://docs.aws.amazon.com/cognito/devguide/identity/external-providers/>`_ in the *Amazon Cognito Developer Guide*.
+For information see, `External Identity Providers <http://docs.aws.amazon.com/cognito/devguide/identity/external-providers/>`_ in the *Amazon Cognito Developer Guide*.
 
 Related Documentation
 ---------------------

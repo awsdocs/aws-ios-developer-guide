@@ -196,6 +196,7 @@ With :command:`AWSKinesisRecorder` created and configured, you can use
 :command:`saveRecord:streamName:` to save records to local storage.
 
     .. container:: option
+
         Swift
             .. code-block:: swift
 

@@ -16,7 +16,7 @@ Authenticate Users with Amazon Cognito Identity
 
 Amazon Cognito Identity provides secure access to AWS services. Identities are managed by an identity pool. Roles specify resources an identity can access and are associated with an identity pool. To create an identity pool for your application:
 
-#. Log into the `Amazon Cognito Console`_ and click the :guilabel:`New Identity Pool` button
+#. Log into the `Amazon Cognito console <https://console.aws.amazon.com/cognito/>`_ and click the :guilabel:`New Identity Pool` button
 #. Give your Identity Pool a unique name and enable access to unauthenticated identities
 #. Click the :guilabel:`Create Pool` button and then the :guilabel:`Update Roles` to create your identity pool and associated roles
 

@@ -74,7 +74,7 @@ To set your project up to use the ``TransferManager`` class, take the steps belo
                     #import <AWSS3/AWSS3.h>
 
 3. Create the ``TransferManager`` Client
-------------------------------------
+----------------------------------------
 
     Add the following code to create an `AWSS3TransferManager` client.
 
@@ -109,7 +109,7 @@ main thread.
 The steps to call ``TransferManager`` for a transfer are as follows.
 
 1. Create an ``AWSS3TransferManagerDownloadRequest``
---------------------------------------------------
+----------------------------------------------------
 
     The following code illustrates the three actions needed to create a download request:
 
@@ -297,6 +297,7 @@ The steps to call ``TransferManager`` for a transfer are as follows.
                     return nil;
                 }];
 
+
 3. Displaying a Downloaded Image in an UIImageView
 --------------------------------------------------
 
@@ -392,7 +393,7 @@ To pause an object transfer, call `pause` on the request object.
                 [downloadRequest pause];
 
 Resume a Transfer
-----------------
+-----------------
 
 To resume a transfer, call `upload` or `download` and pass in
 the paused request object.
@@ -413,7 +414,7 @@ the paused request object.
                 [transferManager download:downloadRequest];
 
 Cancel a Transfer
-----------------
+-----------------
 
 To cancel a transfer, call `cancel` on the upload or download request.
 
@@ -522,7 +523,7 @@ as shown in the following examples.
                     });
 
     Download Progress
-    ---------------
+    -----------------
 
     Track the progress of a download.
 

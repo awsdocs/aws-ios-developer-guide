@@ -36,7 +36,7 @@ into your app, set the appropriate permissions, and import the necessary librari
 
 
 Setting Up
-===============
+==========
 
 Include the SDK in Your Project
 -------------------------------
@@ -44,7 +44,7 @@ Include the SDK in Your Project
 Follow the instructions on the `Set Up the SDK for iOS <http://docs.aws.amazon.com/mobile/sdkforios/developerguide/setup.html>`_ page to include the frameworks for this service.
 
 Set IAM Permissions for Amazon Lex
---------------------------------------------
+----------------------------------
 
 To use |LEX| in an application, create a role and attach policies as described in Step 1 of
 `Getting Started <http://docs.aws.amazon.com/lex/latest/dg/gs-bp-prep.html>`_ in the |LEX-dg|.
@@ -123,7 +123,7 @@ Add the following code using the name and alias of your Lex bot to initialize an
 
 
 Implement `InteractionKit` delegate methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Declare and implement the following methods in the class where you intend to use your `InteractionKit`:
 

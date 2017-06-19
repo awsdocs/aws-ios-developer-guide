@@ -336,7 +336,7 @@ Executing a Block on the Main Thread with AWSTask
 By default, ``continueWithBlock:`` and ``continueWithSuccessBlock:`` are executed on a background thread. But in some cases (for example, updating a UI component based on the result of a service call), you need to execute an operation on the main thread. To execute an operation on the main thread, you can use Grand Central Dispatch or ``AWSExecutor``.
 
 Grand Central Dispatch
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 The following example shows the use of ``dispatch_async(dispatch_get_main_queue(), ^{...});`` to execute a block on the main thread. For error handling, it creates a ``UIAlertView`` on the main thread when record submission fails.
 
@@ -388,7 +388,7 @@ The following example shows the use of ``dispatch_async(dispatch_get_main_queue(
                 }];
 
 AWSExecutor
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 Another option is to use ``AWSExecutor`` as follows.
 

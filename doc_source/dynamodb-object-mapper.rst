@@ -241,7 +241,7 @@ Save Behavior Options
 
 The AWS Mobile SDK for iOS supports the following save behavior options:
 
-* ``AWSDynamoDBObjectMapperSaveBehaviorUpdate`
+* ``AWSDynamoDBObjectMapperSaveBehaviorUpdate``
 
   This option does not affect unmodeled attributes on a save operation. Passing a nil value for the modeled attribute removes the attribute from the corresponding item in Amazon DynamoDB. By default, the object mapper uses this behavior.
 
@@ -523,7 +523,7 @@ In the preceding example, ``indexName`` is specified to demonstrate querying an 
 The query expression is specified using ``keyConditionExpression`` and the values used in the
 expression using ``expressionAttributeValues``.
 
-You can also provide ``filterExpression`` and ``projectionExpressio`n` in ``AWSDynamoDBQueryExpression`. The syntax is the same as that used in a scan operation.
+You can also provide ``filterExpression`` and ``projectionExpression`` in ``AWSDynamoDBQueryExpression``. The syntax is the same as that used in a scan operation.
 
 For more information, see `AWSDynamoDBQueryExpression <http://docs.aws.amazon.com/AWSiOSSDK/latest/Classes/AWSDynamoDBQueryExpression.html>`_.
 

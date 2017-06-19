@@ -33,7 +33,7 @@ Include the AWS Mobile SDK for iOS in an Existing Application
 
 The samples included with the SDK are standalone projects that are already set up. You can also integrate the SDK into your own existing project. Choose one of the following three ways to import the SDK into your project:
 
-- CocoaPods
+- Cocoapods
 - Carthage
 - Dynamic Frameworks
 
@@ -400,9 +400,9 @@ This section is included to give an overview of how you can connect your app to 
 Logging
 #######
 
-As of version 2.5.4 of this SDK, logging utilizes `CocoaLumberjack <https://github.com/CocoaLumberjack/CocoaLumberjack>`_, a flexible, fast, open source logging framework. It supports many capabilities including the ability to set logging level per output target, for instance, concise messages logged to the console and verbose messages to a log file.
+As of version 2.5.4 of this SDK, logging utilizes `CocoaLumberjack SDK <https://github.com/CocoaLumberjack/CocoaLumberjack>`_, a flexible, fast, open source logging framework. It supports many capabilities including the ability to set logging level per output target, for instance, concise messages logged to the console and verbose messages to a log file.
 
-CocoaLumberjack logging levels are additive such that when the level is set to verbose, all messages from the levels below verbose are logged. It is also possible to set custom logging to meet your needs. For more information, see `CocoaLumberjack <https://github.com/CocoaLumberjack/CocoaLumberjack/blob/master/Documentation/CustomLogLevels.md>`_
+CocoaLumberjack logging levels are additive such that when the level is set to verbose, all messages from the levels below verbose are logged. It is also possible to set custom logging to meet your needs. For more information, see `CocoaLumberjack Logging Levels <https://github.com/CocoaLumberjack/CocoaLumberjack/blob/master/Documentation/CustomLogLevels.md>`_
 
 Changing Logging Level
 =======================
@@ -472,7 +472,7 @@ To initialize logging to your Xcode console, use the following code:
         Swift
             .. code-block:: swift
 
-                AWSDDLog.add(AWSDDTTYLogger.sharedInstance()) // TTY = Xcode console
+                AWSDDLog.add(AWSDDTTYLogger.sharedInstance) // TTY = Xcode console
 
         Objective-C
             .. code-block:: objc

@@ -41,7 +41,7 @@ To set your project up to use the AWS SDK for iOS TransferUtility, take the foll
 
 
 2. Import the AWSDynamoDB APIs
----------------------------
+------------------------------
 
 Add the following import statement to your project.
 
