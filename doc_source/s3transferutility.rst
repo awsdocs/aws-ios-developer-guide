@@ -133,7 +133,7 @@ pattern that is common to all the types of transfers ``TransferUtility`` support
                                     key:@"YourObjectKeyName"
                                     contentType:@"text/plain"
                                     expression:nil
-                            completionHander:nil] continueWithBlock:^id(AWSTask *task) {
+                                    completionHandler:nil] continueWithBlock:^id(AWSTask *task) {
                     if (task.error) {
                         NSLog(@"Error: %@", task.error);
                     }
@@ -221,7 +221,7 @@ done for all transfers.
                                 key:@"YourObjectKeyName"
                                 contentType:@"text/plain"
                                 expression:expression
-                        completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                                completionHandler:completionHandler] continueWithBlock:^id(AWSTask *task) {
                     if (task.error) {
                         NSLog(@"Error: %@", task.error);
                     }
@@ -277,7 +277,7 @@ The following example shows the ``cancel`` method being called on an upload.
                                     key:@"YourObjectKeyName"
                                     contentType:@"text/plain"
                                     expression:nil
-                            completionHander:nil] continueWithBlock:^id(AWSTask *task) {
+                                    completionHandler:nil] continueWithBlock:^id(AWSTask *task) {
                     if (task.error) {
                         NSLog(@"Error: %@", task.error);
                     }
@@ -429,7 +429,7 @@ The following code shows how to download a file.
                         bucket: S3BucketName,
                         key: S3DownloadKeyName,
                         expression: expression,
-                        completionHander: completionHandler
+                        completionHandler: completionHandler
                 ).continueWith {
                     (task) -> AnyObject! in if let error = task.error {
                         print("Error: \(error.localizedDescription)")
@@ -454,7 +454,7 @@ The following code shows how to download a file.
                                 bucket:S3BucketName
                                 key:S3DownloadKeyName
                                 expression:expression
-                        completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                                completionHandler:completionHandler] continueWithBlock:^id(AWSTask *task) {
                     if (task.error) {
                         NSLog(@"Error: %@", task.error);
                     }
@@ -518,7 +518,7 @@ initialized, the expired temporary files are cleaned up. If you upload many larg
                                 key:@"YourObjectKeyName"
                                 contentType:@"text/plain"
                                 expression:expression
-                        completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                                completionHandler:completionHandler] continueWithBlock:^id(AWSTask *task) {
                     if (task.error) {
                         NSLog(@"Error: %@", task.error);
                     }
@@ -551,7 +551,7 @@ The following code shows how to download binary a file.
                         fromBucket: S3BucketName,
                         key: S3DownloadKeyName,
                         expression: expression,
-                        completionHander: completionHandler
+                        completionHandler: completionHandler
                 ).continueWith {
                     (task) -> AnyObject! in if let error = task.error {
                         print("Error: \(error.localizedDescription)")
@@ -576,7 +576,7 @@ The following code shows how to download binary a file.
                 [[transferUtility downloadDataFromBucket:S3BucketName
                     key:S3DownloadKeyName
                     expression:expression
-                    completionHander:completionHandler] continueWithBlock:^id(AWSTask *task) {
+                    completionHandler:completionHandler] continueWithBlock:^id(AWSTask *task) {
                         if (task.error) {
                             NSLog(@"Error: %@", task.error);
                         }
