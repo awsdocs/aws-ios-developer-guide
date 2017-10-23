@@ -498,8 +498,8 @@ Using the `uploadProgress` and `downloadProgress` blocks, you can track the prog
 object transfers. These blocks work in conjunction with the Grand Central Dispatch `dispatch_async` function,
 as shown in the following examples.
 
-Upload Progress
----------------
+    Upload Progress
+    ---------------
 
     Track the progress of an upload.
 
@@ -522,8 +522,8 @@ Upload Progress
                          //Update progress
                     });
 
-Download Progress
------------------
+    Download Progress
+    -----------------
 
     Track the progress of a download.
 

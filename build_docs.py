@@ -1,161 +1,143 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Documentation build script for AWS Sphinx documentation on GitHub.
 #
-# Author: Eron Hennessey (eronh@amazon.com)
+# AWS Sphinx configuration file.
 #
-# Copyright © 2016, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+# For more information about how to configure this file, see:
+#
+# https://w.amazon.com/index.php/AWSDevDocs/Sphinx
+#
 
-import sys, os
-import subprocess
-import shutil
+#
+# General information about the project.
+#
 
-SPHINX_MISSING = """
-You must have Sphinx installed to use this script!
+# Optional service/SDK name, typically the three letter acronym (TLA) that
+# represents the service, such as 'SWF'. If this is an SDK, you can use 'SDK'
+# here.
+service_name = u'Mobile SDK'
 
-Go to http://www.sphinx-doc.org for information about installing and using
-Sphinx.
-"""
+# The long version of the service or SDK name, such as "Amazon Simple Workflow
+# Service", "AWS Flow Framework for Ruby" or "AWS SDK for Java"
+service_name_long = u'AWS ' + service_name
 
-FAILED_CHECKOUT = """
-Couldn't clone repository. Please make sure that you have 'git' installed and
-that you can access GitHub repositories using SSH.
-"""
+# The landing page for the service documentation.
+service_docs_home = u'http://aws.amazon.com/documentation/mobile-sdk/'
 
-AWS_SHARED_REPO = 'git@github.com:awsdocs/aws-doc-shared-content.git'
-BUILD_DIR = 'build'
-OUTPUT_DIR = 'output'
-SHARED_DIR = 'shared_content'
-SHARED_SUBDIR = 'sphinx_shared'
-SOURCE_DIR = 'doc_source'
+project = u'iOS Developer Guide'
 
+# A short description of the project.
+project_desc = u'%s %s' % (service_name_long, project)
 
-def check_and_remove_dir(dir_name):
-    """Check to see if the named directory exists. If it does, then remove it.
-    Throw an exception if the directory can't be removed."""
+# the output will be generated in latest/<project_basename> and will appear on
+# the web using the same basename.
+project_basename = 'mobile/sdkforios/developerguide'
 
-    if os.path.exists(dir_name):
-        print("Removing directory: " + dir_name)
-        try:
-            shutil.rmtree(dir_name)
-        except:
-            print("Couldn't remove " + dir_name)
-            print("Remove this directory before building!")
-            sys.exit(1)
+# This name is used as the manual / PDF name. Don't include the extension
+# (.pdf) here.
+man_name = 'aws-ios-dg'
 
+# The language for this version of the docs. Typically 'en'. For a full list of
+# values, see: http://sphinx-doc.org/config.html#confval-language
+language = u'en'
 
-def copy_dir_contents_with_overwrite(input_dir_name, output_dir_name):
-    """Copy the contents of a directory into another, overwriting files if they
-    exist."""
+# Whether or not to show the PDF link. If you generate a PDF for your
+# documentation, set this to True.
+show_pdf_link = True
 
-    # if output_dir_name isn't a location, make it so.
-    if not os.path.exists(output_dir_name):
-        os.makedirs(output_dir_name)
+# Whether or not to show the language selector
+show_lang_selector = True
 
-    dir_entries = os.listdir(input_dir_name)
+# The link to the top of the doc source tree on GitHub. This allows generation
+# of per-page "Edit on GitHub" links.
+github_doc_url = 'https://github.com/awsdocs/aws-ios-developer-guide/tree/master/doc_source'
 
-    for dir_entry in dir_entries:
-        input_path = os.path.join(input_dir_name, dir_entry)
-        output_path = os.path.join(output_dir_name, dir_entry)
+#
+# Version Information
+#
 
-        if os.path.isdir(input_path):
-            copy_dir_contents_with_overwrite(input_path, output_path)
-        else:
-            shutil.copyfile(input_path, output_path)
+# The version info for the project you're documenting, acts as replacement for
+# |version| and |release| substitutions in the documentation, and is also used
+# in various other places throughout the built documents.
 
+# The short X.Y version.
+version = '0.0.3'
 
-def run():
-    # try to import requirements, and complain if they can't be found.
-    try:
-        from sphinx import version_info as sphinx_version
-        print("Using Sphinx version %s.%s.%s" % sphinx_version[0:3])
-    except:
-        print(SPHINX_MISSING)
-        sys.exit(1)
+# The full version, including alpha/beta/rc tags.
+release = '0.0.3'
 
-    build_target = 'html' # by default
-    cmd_switches = []
+#
+# Forum Information
+#
 
-    for arg in sys.argv[1:]:
-        if arg.startswith('--'):
-            cmd_switches.append(arg)
-        else:
-            # the only non-switch argument is the output format.
-            build_target = arg
+# Optional forum ID. If there's a relevant forum at forums.aws.amazon.com, then
+# set the ID here. If not set, then no forum ID link will be generated.
+forum_id = '88'
 
-    print("Building '%s' target." % build_target)
+#
+# Navlinks
+#
 
-    #
-    # Step 0: empty the build dir if it's there.
-    #
-    check_and_remove_dir(BUILD_DIR)
-    check_and_remove_dir(SHARED_DIR)
-    check_and_remove_dir(OUTPUT_DIR)
+# Extra navlinks. You can specify additional links to appear in the top bar here
+# as navlink name / url pairs. If extra_navlinks is not set, then no extra
+# navlinks will be generated.
+#
+# extra_navlinks = [
+#         ('API Reference', 'http://path/to/api/reference'),
+#         ('GitHub', 'http://path/to/github/project'),
+#         ]
+extra_navlinks = [
+        ('API Reference', 'http://docs.aws.amazon.com/AWSiOSSDK/latest/'),
+        ('GitHub', 'https://github.com/aws/aws-sdk-ios'),
+        ('Samples', 'https://github.com/awslabs/aws-sdk-ios-samples'),
+        ('Download SDK',
+            'http://sdk-for-ios.amazonwebservices.com/latest/aws-ios-sdk.zip'),
+    ]
 
-    #
-    # Step 1: grab the shared content and copy it into BUILD_DIR.
-    #
-    print("Getting shared content from " + AWS_SHARED_REPO)
-    try:
-        subprocess.check_call(['git', 'clone', '--depth', '1', AWS_SHARED_REPO,
-            SHARED_DIR])
-    except:
-        print(FAILED_CHECKOUT)
-        sys.exit(1)
+build_html = True
+build_pdf = True #Or False if you don't build a pdf
+build_mobi = False #Or the Kindle ASIN if you need a Kindle build
 
-    shared_input_dir = os.path.join(SHARED_DIR, SHARED_SUBDIR)
-    print("Copying shared content from %s to %s" % (shared_input_dir,
-        BUILD_DIR))
-    copy_dir_contents_with_overwrite(shared_input_dir, BUILD_DIR)
+feedback_name = 'Mobile SDK Docs'
 
-    #
-    # Step 2: copy the contents of SOURCE_DIR into the BUILD_DIR.
-    #
-    print("Copying doc sources from %s to %s" % (SOURCE_DIR, BUILD_DIR))
-    copy_dir_contents_with_overwrite(SOURCE_DIR, BUILD_DIR)
+# For the url docs.aws.amazon.com/docset-root/version/guide-name
+docset_path_slug = 'mobile'
+version_path_slug = 'sdkforios'
+guide_path_slug = 'developerguide'
 
-    #
-    # Append the contents of any files in the 'build/_conf' directory to the
-    # project's conf.py file (so that shared content can add commonly-used
-    # extlinks, etc.).
-    #
-    conf_py_path = os.path.join(BUILD_DIR, 'conf.py')
-    extra_conf_path = os.path.join(BUILD_DIR, '_conf')
-    # first, open the conf.py file for appending...
-    with open(conf_py_path, 'a') as conf_file:
-        # now, add the contents of each file in alpha-sorted order.
-        for filename in sorted(os.listdir(extra_conf_path)):
-            print(" - %s" % filename)
-            conf_file.write('# ** added by extra conf file: %s **\n' % filename)
-            with open(os.path.join(extra_conf_path, filename), 'r') as extra_conf_file:
-                conf_file.write(extra_conf_file.read())
-            conf_file.write('# ** end of content from %s **\n' % filename)
+#
+# EXTRA_CONF_CONTENT -- don't change, move or remove this line!
+#
+# Any settings *below* this act as overrides for the default config content.
+# Declare extlinks <http://sphinx-doc.org/latest/ext/extlinks.html> and
+# additional configuration details specific to this documentation set here.
 
-    #
-    # Step 3: build the docs
-    #
-    print("Building documentation.")
-    try:
-        subprocess.check_call(['sphinx-build', '-b', build_target, BUILD_DIR,
-            OUTPUT_DIR])
-    except:
-        print(FAILED_CHECKOUT)
-        sys.exit(1)
+if 'extlinks' not in vars():
+    extlinks = {}
 
-    #
-    # Step 4: Clean up the build dir and shared content.
-    #
-    if '--noclean' not in cmd_switches:
-        print("Cleaning up.")
-        check_and_remove_dir(BUILD_DIR)
-        check_and_remove_dir(SHARED_DIR)
+# The feedback name is different than the service name...
+html_theme_options = {} #['feedback_name'] = u'Mobile SDK Docs'
 
-    print("Finished! You'll find the built docs in the '%s' directory." %
-            OUTPUT_DIR)
+#-- Intersphinx mappings ------------------------------------------------------
 
+# Mappings are used if you have more than one doc set that you'd like to refer
+# to. The syntax is generally::
+#
+#  intersphinx_mapping = { 'mapname' : ('url', None) }
+#
+# For more information about intersphinx mappings, see:
+#
+# * http://sphinx-doc.org/latest/ext/intersphinx.html
+#
+aws_docs_url = 'http://' + aws_domains['documentation']
+intersphinx_mapping = {
+        'sdkforandroid': (aws_docs_url + '/mobile/sdkforandroid/developerguide', None),
+#        'sdkforios': (aws_docs_url + '/mobile/sdkforios/developerguide', None),
+        'sdkforunity': (aws_docs_url + '/mobile/sdkforunity/developerguide', None),
+        'sdkforxamarin': (aws_docs_url + '/mobile/sdkforxamarin/developerguide', None),
+        }
 
-# If run from the command-line...
-if __name__ == '__main__':
-    run()
-
+extlinks.update({
+    # links to API pages or other non-standard guide links.
+    'pol-dg': (aws_docs_url + '/lex/latest/developerguide/%s.html', ''),
+    'lex-dg': (aws_docs_url + '/polly/latest/dg/%s.html', '')
+})

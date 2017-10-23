@@ -15,6 +15,7 @@ Amazon Mobile Analytics: Try Amazon Pinpoint
 
         Amazon Mobile Analytics is now part of a more fully featured service called `Amazon Pinpoint <http://docs.aws.amazon.com/pinpoint/latest/developerguide/welcome.html>`_. Using Amazon Pinpoint, you can gather and view customized metrics, as in Amazon Mobile Analytics, and then create a campaign to respond to your user's behavior via push notification based on the data you receive.
 
+        Existing Amazon Mobile Analytics for your mobile apps are automatically ported to the `Amazon Pinpoint console <https://console.aws.amazon.com/pinpoint/home/>`_ and will continue to function as expected.
 
 Using Amazon Mobile Analytics, you can track customer behaviors, aggregate metrics, generate
 data visualizations, and identify meaningful patterns. The AWS SDK for iOS provides
