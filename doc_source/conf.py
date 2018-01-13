@@ -93,6 +93,24 @@ extra_navlinks = [
             'http://sdk-for-ios.amazonwebservices.com/latest/aws-ios-sdk.zip'),
     ]
 
+build_html = True
+build_pdf = True #Or False if you don't build a pdf
+build_mobi = False #Or the Kindle ASIN if you need a Kindle build
+
+feedback_name = 'Mobile SDK Docs'
+
+# For the url docs.aws.amazon.com/docset-root/version/guide-name
+docset_path_slug = 'mobile'
+version_path_slug = 'sdkforios'
+guide_path_slug = 'developerguide'
+
+guide_banner = """
+**NEW TO AWS MOBILE?**
+See our `UPDATED DOCS <http://docs.aws.amazon.com/aws-mobile/latest/developerguide/add-aws-mobile-analytics.html>`_
+for streamlined steps to integrate AWS services into your mobile app.
+"""
+
+
 #
 # EXTRA_CONF_CONTENT -- don't change, move or remove this line!
 #
@@ -130,4 +148,3 @@ extlinks.update({
     'pol-dg': (aws_docs_url + '/lex/latest/developerguide/%s.html', ''),
     'lex-dg': (aws_docs_url + '/polly/latest/dg/%s.html', '')
 })
-

@@ -17,11 +17,3 @@ This content has moved to the `AWS Mobile Developer Guide <https://docs.aws.amaz
 The GitHub repository has moved to `https://github.com/awsdocs/aws-mobile-developer-guide/ <https://github.com/awsdocs/aws-mobile-developer-guide/>`_.
 
 
-In this Site
-------------
-
-.. toctree::
-   :maxdepth: 2
-   :titlesonly:
-
-   Welcome1
